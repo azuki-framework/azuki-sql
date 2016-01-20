@@ -22,8 +22,8 @@
     <packaging>jar</packaging>
     
     <name>azuki-sql</name>
-    <description>Azuki Framework SQL library</description>
-    <url>https://github.com/azuki-framework/azuki-base</url>
+    <description>Azuki Framework sql library</description>
+    <url>https://github.com/azuki-framework/azuki-sql</url>
     
     <properties>
         <project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
