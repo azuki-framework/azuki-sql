@@ -20,9 +20,6 @@ package org.azkfw.analysis.lexical.scanner;
 import java.io.File;
 import java.io.IOException;
 import java.nio.charset.Charset;
-import java.util.List;
-
-import org.azkfw.analysis.lexical.Token;
 
 /**
  * このインターフェースは、字句解析のスキャナー機能を定義するインターフェースです。
@@ -31,12 +28,12 @@ import org.azkfw.analysis.lexical.Token;
  */
 public interface Scanner {
 
-	public List<Token> scan(final String string);
+	public Tokens scan(final String string);
 	
-	public List<Token> scan(final File file) throws IOException;
+	public Tokens scan(final File file) throws IOException;
 	
-	public List<Token> scan(final File file, final String charset) throws IOException;
+	public Tokens scan(final File file, final String charset) throws IOException;
 	
-	public List<Token> scan(final File file, final Charset charset) throws IOException;
+	public Tokens scan(final File file, final Charset charset) throws IOException;
 
 }

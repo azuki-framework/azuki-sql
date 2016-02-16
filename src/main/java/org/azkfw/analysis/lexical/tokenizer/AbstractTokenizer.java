@@ -19,7 +19,7 @@ package org.azkfw.analysis.lexical.tokenizer;
 
 import java.util.List;
 
-import org.azkfw.analysis.lexical.Token;
+import org.azkfw.analysis.lexical.scanner.Token;
 
 /**
  * このクラスは、字句解析のトークナイザ機能を実装する為の基底クラスです。

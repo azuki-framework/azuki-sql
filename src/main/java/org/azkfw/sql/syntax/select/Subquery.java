@@ -20,11 +20,11 @@ package org.azkfw.sql.syntax.select;
 import java.util.ArrayList;
 import java.util.List;
 
-import org.azkfw.sql.analyzer.SQLToken;
+import org.azkfw.analysis.lexical.scanner.Token;
 import org.azkfw.sql.syntax.AbstractSyntax;
 import org.azkfw.sql.syntax.SyntaxException;
 import org.azkfw.sql.syntax.clause.OrderByClause;
-import org.azkfw.sql.token.Token;
+import org.azkfw.sql.token.SQLToken;
 
 /**
  * <h1></h1>

@@ -20,10 +20,10 @@ package org.azkfw.sql.syntax.clause;
 import java.util.ArrayList;
 import java.util.List;
 
-import org.azkfw.sql.analyzer.SQLToken;
+import org.azkfw.analysis.lexical.scanner.Token;
 import org.azkfw.sql.syntax.AbstractSyntax;
 import org.azkfw.sql.syntax.SyntaxException;
-import org.azkfw.sql.token.Token;
+import org.azkfw.sql.token.SQLToken;
 
 /**
  * <h1></h1>
@@ -132,8 +132,8 @@ public class ForUpdateClause extends AbstractSyntax {
 			for (int i = 0; i < indexs.size(); i++) {
 				int i9 = indexs.get(i);
 
-				result.add(new SQLToken(","));
 				result.add(new SQLToken(toString(tokens, i1, i9 - i1)));
+				result.add(new SQLToken(","));
 				i1 = i9 + 1;
 			}
 			result.add(new SQLToken(toString(tokens, i1, i2 - i1)));

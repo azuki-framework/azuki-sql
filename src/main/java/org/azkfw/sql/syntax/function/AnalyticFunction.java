@@ -19,9 +19,9 @@ package org.azkfw.sql.syntax.function;
 
 import java.util.List;
 
+import org.azkfw.analysis.lexical.scanner.Token;
 import org.azkfw.sql.syntax.AbstractSyntax;
 import org.azkfw.sql.syntax.SyntaxException;
-import org.azkfw.sql.token.Token;
 
 /**
  * <h1>分析ファンクション</h1>

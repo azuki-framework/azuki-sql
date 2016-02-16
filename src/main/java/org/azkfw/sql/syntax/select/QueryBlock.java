@@ -20,13 +20,14 @@ package org.azkfw.sql.syntax.select;
 import java.util.ArrayList;
 import java.util.List;
 
-import org.azkfw.sql.analyzer.SQLToken;
+import org.azkfw.analysis.lexical.scanner.Token;
+import org.azkfw.analysis.lexical.scanner.pattern.OracleHintTokenPattern;
 import org.azkfw.sql.syntax.AbstractSyntax;
 import org.azkfw.sql.syntax.SyntaxException;
 import org.azkfw.sql.syntax.clause.JoinClause;
 import org.azkfw.sql.syntax.clause.SubqueryFactoringClause;
 import org.azkfw.sql.syntax.clause.WhereClause;
-import org.azkfw.sql.token.Token;
+import org.azkfw.sql.token.SQLToken;
 
 /**
  * <h1></h1>
@@ -126,7 +127,7 @@ public class QueryBlock extends AbstractSyntax {
 		if (i0 >= offset + length) return null;
 		
 		token = tokens.get(i0);
-		if ("HINT".equals(token.getType())) {
+		if (OracleHintTokenPattern.NAME.equals(token.getType())) {
 			result.add( new SQLToken(token.getToken()) );
 			i0 ++;
 		}
@@ -226,6 +227,8 @@ public class QueryBlock extends AbstractSyntax {
 				List<SQLToken> sqlTokens1 = pattern030101(tokens, i0, i9 - i0);
 				if (null == sqlTokens1) {
 					match = false;
+				} else {
+					result.addAll(sqlTokens1);
 				}
 			}
 			

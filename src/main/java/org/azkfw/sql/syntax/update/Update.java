@@ -20,6 +20,7 @@ package org.azkfw.sql.syntax.update;
 import java.util.ArrayList;
 import java.util.List;
 
+import org.azkfw.analysis.lexical.scanner.Token;
 import org.azkfw.sql.syntax.AbstractSyntax;
 import org.azkfw.sql.syntax.SyntaxException;
 import org.azkfw.sql.syntax.clause.DMLTableExpressionClause;
@@ -27,7 +28,6 @@ import org.azkfw.sql.syntax.clause.ErrorLoggingClause;
 import org.azkfw.sql.syntax.clause.ReturningClause;
 import org.azkfw.sql.syntax.clause.UpdateSetClause;
 import org.azkfw.sql.syntax.clause.WhereClause;
-import org.azkfw.sql.token.Token;
 
 /**
  * <h1></h1>

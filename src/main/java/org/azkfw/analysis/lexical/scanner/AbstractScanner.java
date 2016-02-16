@@ -18,11 +18,10 @@
 package org.azkfw.analysis.lexical.scanner;
 
 import java.io.File;
+import java.io.FileInputStream;
 import java.io.IOException;
+import java.io.InputStreamReader;
 import java.nio.charset.Charset;
-import java.util.List;
-
-import org.azkfw.analysis.lexical.Token;
 
 /**
  * このクラスは、字句解析のスキャナー機能を実装する為の基底クラスです。
@@ -32,27 +31,75 @@ import org.azkfw.analysis.lexical.Token;
 public abstract class AbstractScanner implements Scanner {
 
 	@Override
-	public final List<Token> scan(final String string) {
+	public final Tokens scan(final String string) {
 		return doScan(string);
 	}
 
 	@Override
-	public final List<Token> scan(final File file) throws IOException {
-		// TODO 自動生成されたメソッド・スタブ
-		return null;
+	public final Tokens scan(final File file) throws IOException {
+		StringBuilder string = new StringBuilder();
+		
+		InputStreamReader reader = null;
+		try {
+			reader = new InputStreamReader(new FileInputStream(file));
+			char[] buffer = new char[1024];
+			int size = -1;
+			while (-1 != (size = reader.read(buffer, 0 , 1024))) {
+				string.append(buffer, 0, size);
+			}
+			doScan(string.toString());
+		} finally {
+			if (null != reader) {
+				reader.close();
+			}
+		}
+		
+		return doScan(string.toString());
 	}
 
 	@Override
-	public final List<Token> scan(final File file, final String charset) throws IOException {
-		// TODO 自動生成されたメソッド・スタブ
-		return null;
+	public final Tokens scan(final File file, final String charset) throws IOException {
+		StringBuilder string = new StringBuilder();
+		
+		InputStreamReader reader = null;
+		try {
+			reader = new InputStreamReader(new FileInputStream(file), charset);
+			char[] buffer = new char[1024];
+			int size = -1;
+			while (-1 != (size = reader.read(buffer, 0 , 1024))) {
+				string.append(buffer, 0, size);
+			}
+			doScan(string.toString());
+		} finally {
+			if (null != reader) {
+				reader.close();
+			}
+		}
+		
+		return doScan(string.toString());
 	}
 
 	@Override
-	public final List<Token> scan(final File file, final Charset charset) throws IOException {
-		// TODO 自動生成されたメソッド・スタブ
-		return null;
+	public final Tokens scan(final File file, final Charset charset) throws IOException {
+		StringBuilder string = new StringBuilder();
+		
+		InputStreamReader reader = null;
+		try {
+			reader = new InputStreamReader(new FileInputStream(file), charset);
+			char[] buffer = new char[1024];
+			int size = -1;
+			while (-1 != (size = reader.read(buffer, 0 , 1024))) {
+				string.append(buffer, 0, size);
+			}
+			doScan(string.toString());
+		} finally {
+			if (null != reader) {
+				reader.close();
+			}
+		}
+		
+		return doScan(string.toString());
 	}
 
-	protected abstract List<Token> doScan(final String string);
+	protected abstract Tokens doScan(final String string);
 }

@@ -19,7 +19,7 @@ package org.azkfw.sql.syntax;
 
 import java.util.List;
 
-import org.azkfw.sql.token.Token;
+import org.azkfw.analysis.lexical.scanner.Token;
 
 /**
  * 

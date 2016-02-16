@@ -34,14 +34,16 @@ import javax.swing.JFrame;
 import javax.swing.JScrollPane;
 import javax.swing.JSplitPane;
 
+import org.azkfw.analysis.lexical.scanner.SQLScanner;
+import org.azkfw.analysis.lexical.scanner.Scanner;
+import org.azkfw.analysis.lexical.scanner.Token;
+import org.azkfw.analysis.lexical.scanner.Tokens;
+import org.azkfw.analysis.lexical.scanner.pattern.DustTokenPattern;
 import org.azkfw.component.text.TextEditor;
 import org.azkfw.component.text.TextGradationsView;
 import org.azkfw.component.text.TextLineNumberView;
-import org.azkfw.sql.analyzer.LexicalAnalyzer;
-import org.azkfw.sql.analyzer.SQLLexicalAnalyzer;
 import org.azkfw.sql.syntax.SyntaxException;
 import org.azkfw.sql.syntax.select.Select;
-import org.azkfw.sql.token.Token;
 
 /**
  * @author Kawakicchi
@@ -113,26 +115,29 @@ public class SQLFrame extends JFrame {
 			}
 		});
 		
-		split1.setDividerLocation(350);
-		split2.setDividerLocation(500);
+		split1.setDividerLocation(600);
+		split2.setDividerLocation(200);
 		setSize(1400, 600);
 		
 	}
 	private void doLoad() {
-		LexicalAnalyzer analyzer = new SQLLexicalAnalyzer();
-		analyzer.analyze(getString(Paths.get("src", "test", "resources", "select01.sql").toFile(), "UTF-8"));
-		// analyzer.analyze(getString(Paths.get("src", "test", "resources", "update01.sql").toFile(), "UTF-8"));
+		String source = getString(Paths.get("src", "test", "resources", "select.sql").toFile(), "UTF-8");
+		
+		Scanner scanner = new SQLScanner();
+		Tokens ts = scanner.scan(source);
 
+		txtPlain1.setText(source);
+		
 		List<Token> tokens = new ArrayList<Token>();
-		for (Token token : analyzer.getTokenList()) {
-			if (!"DUST".equals(token.getType())) {
+		for (Token token : ts.list()) {
+			if (!DustTokenPattern.NAME.equals(token.getType())) {
 				tokens.add(token);
 			}
 		}
 		
 		String str1 = toString(tokens);
 		System.out.println(str1);
-		txtPlain1.setText(str1);
+		txtPlain2.setText(str1);
 
 		try {
 			Select a = new Select();

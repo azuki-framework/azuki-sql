@@ -19,7 +19,7 @@ package org.azkfw.analysis.lexical.tokenizer;
 
 import java.util.List;
 
-import org.azkfw.analysis.lexical.Token;
+import org.azkfw.analysis.lexical.scanner.Token;
 
 /**
  * このインターフェースは、字句解析のトークナイザ機能を定義するインターフェースです。

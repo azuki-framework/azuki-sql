@@ -20,14 +20,14 @@ package org.azkfw.sql.syntax.select;
 import java.util.ArrayList;
 import java.util.List;
 
-import org.azkfw.sql.analyzer.SQLToken;
+import org.azkfw.analysis.lexical.scanner.Token;
 import org.azkfw.sql.syntax.AbstractSyntax;
 import org.azkfw.sql.syntax.SyntaxException;
 import org.azkfw.sql.syntax.clause.FlashbackQueryClause;
 import org.azkfw.sql.syntax.clause.PivotClause;
 import org.azkfw.sql.syntax.clause.UnpivotClause;
 import org.azkfw.sql.syntax.expression.QueryTableExpression;
-import org.azkfw.sql.token.Token;
+import org.azkfw.sql.token.SQLToken;
 
 /**
  * <h1></h1>
