@@ -93,7 +93,7 @@ public class PatternScanner extends AbstractScanner {
 		}
 		if (0 < buffer.length()) {
 			if (null != pattern) {
-				tokens.add(new Token(startIndex, buffer.toString(), pattern.getName()));				
+				tokens.add(new Token(startIndex, buffer.toString(), pattern.getName()));
 			} else {
 				tokens.add(new Token(startIndex, buffer.toString()));
 			}

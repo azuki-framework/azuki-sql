@@ -17,34 +17,54 @@
  */
 package org.azkfw.analysis.lexical.scanner.pattern;
 
+import java.util.regex.Pattern;
+
 
 /**
  * 
  * @author Kawakicchi
  */
-public class SemicolonTokenPattern extends AbstractTokenPattern {
+public class OracleWordTokenPattern extends AbstractTokenPattern {
 
-	public static final String NAME = "Semicolon";
+	public static final String NAME = "Oracle word";
 
-	public SemicolonTokenPattern() {
+	private static final Pattern PTN1 = Pattern.compile("^[_a-zA-Z]$");
+	private static final Pattern PTN2 = Pattern.compile("^[_a-zA-Z0-9]$");
+
+	private boolean endFlag;
+
+	public OracleWordTokenPattern() {
 		super(NAME);
 	}
 
-	protected SemicolonTokenPattern(final String name) {
+	protected OracleWordTokenPattern(final String name) {
 		super(name);
 	}
-
+	
 	@Override
 	public Integer start(final String string, final int index) {
 		Integer result = null;
-		if (';' == string.charAt(index)) {
+
+		String s = Character.toString(string.charAt(index));
+		if (PTN1.matcher(s).matches()) {
+			endFlag = false;
 			result = 1;
 		}
+
 		return result;
 	}
 
 	@Override
 	public Integer read(final String string, final int index) {
-		return null;
+		Integer result = null;
+		if (!endFlag) {
+			String s = Character.toString(string.charAt(index));
+			if (PTN2.matcher(s).matches()) {
+				result = 1;
+			} else {
+				endFlag = true;
+			}
+		}
+		return result;
 	}
 }

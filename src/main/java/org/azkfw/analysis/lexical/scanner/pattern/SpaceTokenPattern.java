@@ -17,18 +17,19 @@
  */
 package org.azkfw.analysis.lexical.scanner.pattern;
 
-
 /**
  * 
  * @author Kawakicchi
  */
 public class SpaceTokenPattern extends AbstractTokenPattern {
 
+	public static final String NAME = "Space";
+
 	public SpaceTokenPattern() {
-		super("SPACE");
+		super(NAME);
 	}
 
-	public SpaceTokenPattern(final String name) {
+	protected SpaceTokenPattern(final String name) {
 		super(name);
 	}
 

@@ -23,11 +23,13 @@ package org.azkfw.analysis.lexical.scanner.pattern;
  */
 public class BraceTokenPattern extends AbstractTokenPattern {
 
+	public static final String NAME = "Brace";
+
 	public BraceTokenPattern() {
-		super("BRACE");
+		super(NAME);
 	}
 
-	public BraceTokenPattern(final String name) {
+	protected BraceTokenPattern(final String name) {
 		super(name);
 	}
 	

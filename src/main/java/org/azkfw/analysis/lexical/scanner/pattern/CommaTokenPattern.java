@@ -23,11 +23,13 @@ package org.azkfw.analysis.lexical.scanner.pattern;
  */
 public class CommaTokenPattern extends AbstractTokenPattern {
 
+	public static final String NAME = "Comma";
+
 	public CommaTokenPattern() {
-		super("COMMA");
+		super(NAME);
 	}
 
-	public CommaTokenPattern(final String name) {
+	protected CommaTokenPattern(final String name) {
 		super(name);
 	}
 

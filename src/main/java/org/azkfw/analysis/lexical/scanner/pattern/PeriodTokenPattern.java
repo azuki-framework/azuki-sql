@@ -24,11 +24,13 @@ package org.azkfw.analysis.lexical.scanner.pattern;
  */
 public class PeriodTokenPattern extends AbstractTokenPattern {
 
+	public static final String NAME = "Period";
+
 	public PeriodTokenPattern() {
-		super("PERIOD");
+		super(NAME);
 	}
 
-	public PeriodTokenPattern(final String name) {
+	protected PeriodTokenPattern(final String name) {
 		super(name);
 	}
 

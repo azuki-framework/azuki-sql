@@ -23,11 +23,13 @@ package org.azkfw.analysis.lexical.scanner.pattern;
  */
 public class EqualTokenPattern extends AbstractTokenPattern {
 
+	public static final String NAME = "Equal";
+
 	public EqualTokenPattern() {
-		super("EQUAL");
+		super(NAME);
 	}
 
-	public EqualTokenPattern(final String name) {
+	protected EqualTokenPattern(final String name) {
 		super(name);
 	}
 

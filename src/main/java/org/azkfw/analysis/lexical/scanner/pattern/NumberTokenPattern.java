@@ -27,7 +27,7 @@ public class NumberTokenPattern extends AbstractTokenPattern {
 
 	public static final String NAME = "Number";
 
-	private static final Pattern PTN = Pattern.compile("^[a-zA-Z]$");
+	private static final Pattern PTN = Pattern.compile("^[_a-zA-Z]$");
 
 	public NumberTokenPattern() {
 		super(NAME);
@@ -40,7 +40,7 @@ public class NumberTokenPattern extends AbstractTokenPattern {
 	@Override
 	public Integer start(final String string, final int index) {
 		if (0 < index) {
-			String s = string.charAt(index-1) + "";
+			String s = Character.toString(string.charAt(index-1));
 			if (PTN.matcher(s).matches()) {
 				return null;
 			}

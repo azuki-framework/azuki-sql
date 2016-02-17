@@ -23,11 +23,13 @@ package org.azkfw.analysis.lexical.scanner.pattern;
  */
 public class AtSignTokenPattern extends AbstractTokenPattern {
 
+	public static final String NAME = "At sign";
+
 	public AtSignTokenPattern() {
-		super("ATSIGN");
+		super(NAME);
 	}
 
-	public AtSignTokenPattern(final String name) {
+	protected AtSignTokenPattern(final String name) {
 		super(name);
 	}
 

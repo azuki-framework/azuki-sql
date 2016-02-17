@@ -23,11 +23,13 @@ package org.azkfw.analysis.lexical.scanner.pattern;
  */
 public class OperatorTokenPattern extends AbstractTokenPattern {
 
+	public static final String NAME = "Operator";
+
 	public OperatorTokenPattern() {
-		super("OPERATOR");
+		super(NAME);
 	}
-	
-	public OperatorTokenPattern(final String name) {
+
+	protected OperatorTokenPattern(final String name) {
 		super(name);
 	}
 

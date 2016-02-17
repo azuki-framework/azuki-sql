@@ -24,11 +24,13 @@ package org.azkfw.analysis.lexical.scanner.pattern;
  */
 public class ReturnTokenPattern extends AbstractTokenPattern {
 
+	public static final String NAME = "Return";
+
 	public ReturnTokenPattern() {
-		super("RETURN");
+		super(NAME);
 	}
 	
-	public ReturnTokenPattern(final String name) {
+	protected ReturnTokenPattern(final String name) {
 		super(name);
 	}
 

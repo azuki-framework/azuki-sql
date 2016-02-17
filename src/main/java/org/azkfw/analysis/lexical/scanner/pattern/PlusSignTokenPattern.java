@@ -24,11 +24,13 @@ package org.azkfw.analysis.lexical.scanner.pattern;
  */
 public class PlusSignTokenPattern extends AbstractTokenPattern {
 
+	public static final String NAME = "Plus sign";
+
 	public PlusSignTokenPattern() {
-		super("PLUSSIGN");
+		super(NAME);
 	}
 
-	public PlusSignTokenPattern(final String name) {
+	protected PlusSignTokenPattern(final String name) {
 		super(name);
 	}
 

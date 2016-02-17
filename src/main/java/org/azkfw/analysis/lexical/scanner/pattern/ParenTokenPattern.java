@@ -24,11 +24,13 @@ package org.azkfw.analysis.lexical.scanner.pattern;
  */
 public class ParenTokenPattern extends AbstractTokenPattern {
 
+	public static final String NAME = "Paren";
+
 	public ParenTokenPattern() {
-		super("PAREN");
+		super(NAME);
 	}
 
-	public ParenTokenPattern(final String name) {
+	protected ParenTokenPattern(final String name) {
 		super(name);
 	}
 

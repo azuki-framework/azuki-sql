@@ -28,18 +28,29 @@ public class StringTokenPattern extends AbstractTokenPattern {
 
 	private boolean endFlag;
 
+	private int type;
+	private static final int TYPE_DOUBLE = 1;
+	private static final int TYPE_SINGLE = 2;
+
 	public StringTokenPattern() {
 		super(NAME);
+		type = 0;
 	}
 	
 	protected StringTokenPattern(final String name) {
 		super(name);
+		type = 0;
 	}
 	
 	@Override
 	public Integer start(final String string, final int index) {
 		Integer result = null;
 		if ('\'' == string.charAt(index)) {
+			type = TYPE_SINGLE;
+			endFlag = false;
+			result = 1;
+		} else if ('"' == string.charAt(index)) {
+			type = TYPE_DOUBLE;
 			endFlag = false;
 			result = 1;
 		}
@@ -50,21 +61,40 @@ public class StringTokenPattern extends AbstractTokenPattern {
 	public Integer read(final String string, final int index) {
 		Integer result = null;
 		if (!endFlag) {
-			if ('\'' == string.charAt(index)) {
-				if (string.length() > index + 1) {
-					if ('\'' == string.charAt(index + 1)) {
-						result = 2;
+			if (type == TYPE_SINGLE) {
+				if ('\'' == string.charAt(index)) {
+					if (string.length() > index + 1) {
+						if ('\'' == string.charAt(index + 1)) {
+							result = 2;
+						} else {
+							endFlag = true;
+							result = 1;
+						}
 					} else {
+						// これ以上データなし
 						endFlag = true;
 						result = 1;
 					}
 				} else {
-					// これ以上データなし
-					endFlag = true;
 					result = 1;
 				}
-			} else {
-				result = 1;
+			} else if (type == TYPE_DOUBLE) {
+				if ('"' == string.charAt(index)) {
+					if (string.length() > index + 1) {
+						if ('"' == string.charAt(index + 1)) {
+							result = 2;
+						} else {
+							endFlag = true;
+							result = 1;
+						}
+					} else {
+						// これ以上データなし
+						endFlag = true;
+						result = 1;
+					}
+				} else {
+					result = 1;
+				}
 			}
 		}
 		return result;

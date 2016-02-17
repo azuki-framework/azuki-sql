@@ -17,8 +17,6 @@
  */
 package org.azkfw.analysis.lexical.scanner.pattern;
 
-
-
 /**
  * 
  * @author Kawakicchi

@@ -18,15 +18,31 @@
 package org.azkfw.analysis.lexical.scanner.pattern;
 
 /**
- * 
+ * このインターフェースは、トークンパターンを定義するインターフェースです。
  * @author Kawakicchi
  */
 public interface TokenPattern {
 
+	/**
+	 * 
+	 * @return 名前
+	 */
 	public String getName();
 	
+	/**
+	 * 
+	 * @param string 文字列
+	 * @param index 読み込み開始位置
+	 * @return 読み込み数、マッチしなかった場合、<code>null</code>を返す。
+	 */
 	public Integer start(final String string, final int index);
 
+	/**
+	 * 
+	 * @param string 文字列
+	 * @param index 読み込み開始位置
+	 * @return 読み込み数、読み込み終了の場合、<code>null</code>を返す。
+	 */
 	public Integer read(final String string, final int index);
 
 }

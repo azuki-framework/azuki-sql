@@ -24,11 +24,13 @@ package org.azkfw.analysis.lexical.scanner.pattern;
  */
 public class TabTokenPattern extends AbstractTokenPattern {
 
+	public static final String NAME = "Tab";
+
 	public TabTokenPattern() {
-		super("TAB");
+		super(NAME);
 	}
 
-	public TabTokenPattern(final String name) {
+	protected TabTokenPattern(final String name) {
 		super(name);
 	}
 
