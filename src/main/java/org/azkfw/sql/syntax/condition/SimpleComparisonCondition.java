@@ -190,7 +190,7 @@ public class SimpleComparisonCondition extends AbstractSyntax{
 	private List<SQLToken> pattern0202(final List<Token> tokens, final int offset, final int length) throws SyntaxException {
 		if (3 <= length) {
 			if (startsWith(tokens, offset, length, "(") && endsWith(tokens, offset, length, ")")) {
-				Subquery subquery = new Subquery(getNestIndex());
+				Subquery subquery = new Subquery(this, 0, getNestIndex());
 				if (subquery.analyze(tokens, offset, length)) {
 
 					List<SQLToken> sqlTokens = new ArrayList<SQLToken>();

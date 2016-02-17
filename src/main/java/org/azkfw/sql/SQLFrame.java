@@ -115,8 +115,8 @@ public class SQLFrame extends JFrame {
 			}
 		});
 		
-		split1.setDividerLocation(600);
-		split2.setDividerLocation(200);
+		split1.setDividerLocation(450);
+		split2.setDividerLocation(300);
 		setSize(1400, 600);
 		
 	}

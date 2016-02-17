@@ -1,3 +1,4 @@
+(
 SELECT /*+ hint */
     query_name.*
   , schema1 . table1 . *
@@ -22,12 +23,13 @@ AND (
         d = 0
     OR  e = 0
     )
+)
 ORDER SIBLINGS BY
     column1
   , column2 ASC
   , column3 NULLS FIRST
   , column4 DESC NULLS LAST
-FOR update OF 
+FOR UPDATE OF 
     schema1 . table1 . column1
   , table2.column2
   , column3

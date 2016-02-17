@@ -23,6 +23,7 @@ import java.util.List;
 import org.azkfw.analysis.lexical.scanner.Token;
 import org.azkfw.sql.syntax.AbstractSyntax;
 import org.azkfw.sql.syntax.SyntaxException;
+import org.azkfw.sql.syntax.expression.Expr;
 import org.azkfw.sql.token.SQLToken;
 
 /**
@@ -43,9 +44,6 @@ import org.azkfw.sql.token.SQLToken;
  */
 public class OrderByClause extends AbstractSyntax {
 	
-	public OrderByClause() {
-	}
-	
 	public OrderByClause(final int index) {
 		super(index);
 	}
@@ -55,25 +53,25 @@ public class OrderByClause extends AbstractSyntax {
 		trace(toString(tokens, offset, length));
 		List<SQLToken> sqlTokens = new ArrayList<SQLToken>();
 
-		int i0 = offset;
-		int i9 = offset + length;
+		int start = offset;
+		int end = offset + length;
 		
 		if (startsWith(tokens, offset, length, "ORDER", "SIBLINGS", "BY")) {
 			sqlTokens.add( new SQLToken("ORDER") );
 			sqlTokens.add( new SQLToken("SIBLINGS") );
 			sqlTokens.add( new SQLToken("BY") );
-			i0 = offset + 3;
+			start = offset + 3;
 			
 		} else if (startsWith(tokens, offset, length, "ORDER", "BY")) {
 			sqlTokens.add( new SQLToken("ORDER") );
 			sqlTokens.add( new SQLToken("BY") );
-			i0 = offset + 2;
+			start = offset + 2;
 
 		} else {
 			return false;
 		}
 		
-		List<SQLToken> sqlTokens1 = pattern01(tokens, i0, i9 - i0);
+		List<SQLToken> sqlTokens1 = pattern01(tokens, start, end - start);
 		if(null == sqlTokens1) {
 			return false;
 		}
@@ -86,21 +84,82 @@ public class OrderByClause extends AbstractSyntax {
 	private List<SQLToken> pattern01(final List<Token> tokens, final int offset, final int length) throws SyntaxException {
 		List<SQLToken> result = new ArrayList<SQLToken>();
 
-		int i0 = offset;
-		int i2 = offset + length;		
-		int i1 = i0;
-		
 		List<Integer> indexs = splitToken(tokens, offset, length, ",");
-		for (int i = 0 ; i < indexs.size() ; i++) {
-			int i9 = indexs.get(i);
-			result.add( new SQLToken(toString(tokens, i1, i9-i1)) );
-			
-			i1 = i9 + 1;
-			result.add( new SQLToken(","));
+		int pattern = getPatternSize(indexs);
+		for (int i = pattern - 1 ; i >= 0 ; i--) {
+			List<Integer> indexs2 = getPattern(indexs, i);
+
+			result.clear();
+			boolean match = true;
+
+			int start = offset;
+			int end = offset + length;	
+			int index1 = start;
+
+			for (int j = 0 ; j < indexs2.size() ; j++) {
+				int index2 = indexs2.get(j);
+
+				List<SQLToken> sqlTokens1 = pattern0101(tokens, index1, index2 - index1);
+				if (null == sqlTokens1) {
+					match = false;
+					break;
+				}
+				result.addAll(sqlTokens1);
+				result.add( new SQLToken(","));
+				
+				index1 = index2 + 1;
+			}
+			if (match) {
+				List<SQLToken> sqlTokens1 = pattern0101(tokens, index1, end - index1);
+				if (null == sqlTokens1) {
+					continue;
+				}
+				result.addAll(sqlTokens1);
+			}
+
+			if (match) {
+				return result;
+			}
 		}
-		result.add( new SQLToken(toString(tokens, i1, i2-i1)) );
-		
-		return result;
+		return null;
 	}
 
+	private List<SQLToken> pattern0101(final List<Token> tokens, final int offset, final int length) throws SyntaxException {
+		List<SQLToken> result = new ArrayList<SQLToken>();
+		
+		int start = offset;
+		int end = offset + length;
+		
+		if (endsWith(tokens, start, end - start, "NULLS", "FIRST")) {
+			result.add(new SQLToken("NULLS"));
+			result.add(new SQLToken("FIRST"));
+			end -= 2;
+		} else if (endsWith(tokens, start, end - start, "NULLS", "LAST")) {
+			result.add(new SQLToken("NULLS"));
+			result.add(new SQLToken("LAST"));
+			end -= 2;			
+		}
+		if (endsWith(tokens, start, end - start, "ASC")) {
+			result.add(0, new SQLToken("ASC"));
+			end -= 1;
+		} else if (endsWith(tokens, start, end - start, "DESC")) {
+			result.add(0, new SQLToken("DESC"));
+			end -= 1;			
+		}
+		
+		if (0 == end - start) {
+			return null;
+		} else if (1 == end - start) {
+			// position or c_alias
+			result.add(0, new SQLToken(tokens.get(offset).getToken()));
+		} else {
+			//
+			Expr expr = new Expr(getNestIndex());
+			if (!expr.analyze(tokens, start, end - start)) {
+				return null;
+			}
+			result.add(0, expr.getSQLToken());
+		}
+		return result;
+	}
 }

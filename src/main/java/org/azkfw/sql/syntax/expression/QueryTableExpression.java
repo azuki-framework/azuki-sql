@@ -135,7 +135,7 @@ public class QueryTableExpression extends AbstractSyntax {
 			sqlTokens.clear();
 			sqlTokens.add( new SQLToken("(") );
 
-			Subquery subquery = new Subquery(getNestIndex());
+			Subquery subquery = new Subquery(this, 0, getNestIndex());
 			if (!subquery.analyze(tokens, i0, i1-i0)) continue;
 			sqlTokens.add(subquery.getSQLToken());
 

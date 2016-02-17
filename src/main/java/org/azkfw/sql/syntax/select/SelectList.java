@@ -84,24 +84,25 @@ public class SelectList extends AbstractSyntax {
 				sqlTokens.clear();
 				boolean match = true;
 				
-				int i0 = offset;
-				int i2 = offset + length;
+				int start = offset;
+				int end = offset + length;
+				int index1 = start;
+				
 				for (int j = 0 ; j < indexs2.size() ; j++) {
-					int i1 = indexs2.get(j);
+					int index2 = indexs2.get(j);
 					
-					List<SQLToken> sqlTokens1 = pattern01(tokens, i0, i1-i0);
+					List<SQLToken> sqlTokens1 = pattern01(tokens, index1, index2 - index1);
 					if (null == sqlTokens1) {
 						match = false;
 						break;
 					}
 					sqlTokens.addAll(sqlTokens1);
+					sqlTokens.add( new SQLToken(","));
 					
-					i0 = i1 + 1;
-					
-					sqlTokens.add( new SQLToken(","));					
+					index1 = index2 + 1;
 				}
 				if (match) {
-					List<SQLToken> sqlTokens1 = pattern01(tokens, i0, i2-i0);
+					List<SQLToken> sqlTokens1 = pattern01(tokens, index1, end - index1);
 					if (null == sqlTokens1) {
 						continue;
 					}

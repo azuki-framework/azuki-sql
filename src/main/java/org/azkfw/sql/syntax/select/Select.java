@@ -50,80 +50,85 @@ import org.azkfw.sql.token.SQLToken;
  * @author Kawakicchi
  */
 public class Select extends AbstractSyntax {
-	
+
 	public Select() {
 	}
-	
+
 	public Select(final int index) {
 		super(index);
 	}
-	
+
 	@Override
 	protected final boolean doAnalyze(final List<Token> tokens, final int offset, final int length) throws SyntaxException {
 		trace(toString(tokens, offset, length));
 		List<SQLToken> sqlTokens = new ArrayList<SQLToken>();
 
+		int start = offset;
+		int end = offset + length;
+
 		if (endsWith(tokens, offset, length, ";")) {
+			end = offset + length - 1;
+		}
 
-			int i0 = offset;
-			int i2 = offset + length - 1;
+		boolean match = false;
 
-			boolean match = false;
-			
-			List<Integer> indexs = splitToken(tokens, offset, length, "FOR");
-			for (int i = indexs.size()-1 ; i >= 0 ; i--) {
-				int i1 = indexs.get(i);
-				
-				List<SQLToken> sqlTokens1 = pattern01(tokens, i0, i1-i0);
-				if (null == sqlTokens1) {
-					continue;
-				}
-	
-				List<SQLToken> sqlTokens2 = pattern02(tokens, i1, i2-i1);
-				if (null == sqlTokens2) {
-					continue;
-				}
-	
+		List<Integer> indexs = splitToken(tokens, offset, length, "FOR");
+		for (int i = indexs.size() - 1; i >= 0; i--) {
+			int index = indexs.get(i);
+
+			List<SQLToken> sqlTokens1 = pattern01(tokens, start, index - start);
+			if (null == sqlTokens1) {
+				continue;
+			}
+
+			List<SQLToken> sqlTokens2 = pattern02(tokens, index, end - index);
+			if (null == sqlTokens2) {
+				continue;
+			}
+
+			match = true;
+			sqlTokens.addAll(sqlTokens1);
+			sqlTokens.addAll(sqlTokens2);
+			break;
+		}
+		if (!match) {
+			List<SQLToken> sqlTokens1 = pattern01(tokens, start, end - start);
+			if (null != sqlTokens1) {
 				match = true;
 				sqlTokens.addAll(sqlTokens1);
-				sqlTokens.addAll(sqlTokens2);
-				break;
-			}
-			if (!match) {
-				List<SQLToken> sqlTokens1 = pattern01(tokens, i0, i2-i0);
-				if (null != sqlTokens1) {
-					match = true;
-					sqlTokens.addAll(sqlTokens1);
-				}
-			}
-			
-			sqlTokens.add( new SQLToken(";") );
-
-			if (match) {
-				setSQLToken(new SQLToken(sqlTokens));
-				return true;
 			}
 		}
+
+
+		if (match) {
+			if (endsWith(tokens, offset, length, ";")) {
+				sqlTokens.add(new SQLToken(";"));
+			}
+			
+			setSQLToken(new SQLToken(sqlTokens));
+			return true;
+		}
+
 		return false;
 	}
 
 	private List<SQLToken> pattern01(final List<Token> tokens, final int offset, final int length) throws SyntaxException {
 		List<SQLToken> sqlTokens = new ArrayList<SQLToken>();
-		
-		Subquery subquery = new Subquery(getNestIndex());
+
+		Subquery subquery = new Subquery(this, 0, getNestIndex());
 		if (!subquery.analyze(tokens, offset, length)) {
 			return null;
 		}
 		SQLToken sqlToken = subquery.getSQLToken();
 		sqlTokens.add(sqlToken);
-		
+
 		return sqlTokens;
 	}
 
 	private List<SQLToken> pattern02(final List<Token> tokens, final int offset, final int length) throws SyntaxException {
 		List<SQLToken> sqlTokens = new ArrayList<SQLToken>();
-		
-		if (0 < length) {
+
+		if (2 <= length) { // FOR UPDATE
 			ForUpdateClause forUpdateClause = new ForUpdateClause(getNestIndex());
 			if (!forUpdateClause.analyze(tokens, offset, length)) {
 				return null;
@@ -131,7 +136,7 @@ public class Select extends AbstractSyntax {
 			SQLToken sqlToken = forUpdateClause.getSQLToken();
 			sqlTokens.add(sqlToken);
 		}
-		
+
 		return sqlTokens;
 	}
 
