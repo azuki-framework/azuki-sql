@@ -99,6 +99,51 @@ public abstract class AbstractSyntax implements Syntax {
 		return true;
 	}
 	
+	protected static int indexOf(final List<Token> tokens, final int offset, final int length, final String...keywords) {
+		int index = -1;
+		for (int i = offset ; i < offset + length ; i++) {
+			Token token = tokens.get(i);
+			if (isEqualsToken(token, keywords)) {
+				index = i;
+				break;
+			}
+		}
+		return index;
+	}
+	
+	protected static int indexOfEx(final List<Token> tokens, final int offset, final int length, final String...keywords) {
+		int cntParen = 0;
+		int index = -1;
+		for (int i = offset ; i < offset + length ; i++) {
+			Token token = tokens.get(i);
+			
+			if (isEqualsToken(token, "(")) {
+				cntParen ++;
+			} else if (isEqualsToken(token, ")")) {
+				cntParen --;
+			}
+
+			if (0 == cntParen) {
+				if (isEqualsToken(token, keywords)) {
+					index = i;
+					break;
+				}
+			}
+		}
+		return index;
+	}
+
+	protected static int lastIndexOf(final List<Token> tokens, final int offset, final int length, final String...keywords) {
+		int index = -1;
+		for (int i = offset + length - 1 ; i >= offset ; i--) {
+			if (isEqualsToken(tokens.get(i), keywords)) {
+				index = i;
+				break;
+			}
+		}
+		return index;
+	}
+
 	protected static boolean startsWith(final List<Token> tokens, final int offset, final int length, final String...keywords) {
 		if (length < keywords.length) return false;
 		for (int i = 0 ; i < keywords.length ; i++) {
@@ -128,7 +173,30 @@ public abstract class AbstractSyntax implements Syntax {
 		}
 		return indexs;
 	}
-	
+
+	protected List<Integer> splitTokenEx(final List<Token> tokens, final int offset, final int length, final String...keywords) {
+		// trace(toString(tokens, offset, length));
+		int cntParen = 0;
+		List<Integer> indexs = new ArrayList<Integer>();
+		for (int i = offset ; i < offset + length ; i++) {
+			Token token = tokens.get(i);
+
+			if (isEqualsToken(token, "(")) {
+				cntParen ++;
+			} else if (isEqualsToken(token, ")")) {
+				cntParen --;
+			}
+
+			if (0 == cntParen) {
+				if (isEqualsToken(token, keywords)) {
+					indexs.add(i);
+				}
+			}
+
+		}
+		return indexs;
+	}
+
 	protected static boolean isEqualsToken(final Token token, final List<String> keywords) {
 		boolean result = false;
 		if (null != token && null != keywords) {

@@ -138,7 +138,7 @@ public class CompoundCondition extends AbstractSyntax {
 	 * @throws SyntaxException
 	 */
 	private List<SQLToken> pattern03(final List<Token> tokens, final int offset, final int length) throws SyntaxException {
-		List<Integer> indexs = splitToken(tokens, offset, length, "AND", "OR");
+		List<Integer> indexs = splitTokenEx(tokens, offset, length, "AND", "OR");
 		for (int i = 0; i < indexs.size(); i++) {
 			int index = indexs.get(i);
 

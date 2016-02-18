@@ -43,11 +43,7 @@ import org.azkfw.sql.token.SQLToken;
  * @author Kawakicchi
  */
 public class SelectList extends AbstractSyntax {
-	
 
-	public SelectList() {
-	}
-	
 	public SelectList(final int index) {
 		super(index);
 	}
@@ -56,6 +52,66 @@ public class SelectList extends AbstractSyntax {
 	protected final boolean doAnalyze(final List<Token> tokens, final int offset, final int length) throws SyntaxException {
 		trace(toString(tokens, offset, length));
 
+		if (1 == length) {
+			if (endsWith(tokens, offset, length, "*")) {
+				List<SQLToken> sqlTokens = new ArrayList<SQLToken>();
+				sqlTokens.add( new SQLToken("*") );
+				setSQLToken( new SQLToken(sqlTokens) );
+				return true;
+			}
+		} else if (3 == length) {
+			if (endsWith(tokens, offset, length, ".", "*")) {
+				List<SQLToken> sqlTokens = new ArrayList<SQLToken>();
+				sqlTokens.add( new SQLToken(tokens.get(offset).getToken()) ); // t_alias
+				sqlTokens.add( new SQLToken(".") );
+				sqlTokens.add( new SQLToken("*") );
+				setSQLToken( new SQLToken(sqlTokens) );
+				return true;
+			}
+		}
+
+		List<SQLToken> result = new ArrayList<SQLToken>();
+
+		List<Integer> indexs = splitTokenEx(tokens, offset, length, ",");
+		int pattern = getPatternSize(indexs);
+//		for (int i = 0 ; i < pattern ; i++) {
+		for (int i = pattern - 1 ; i >= 0 ; i--) { // 全件から
+			boolean match = true;
+
+			result.clear();
+			
+			int i0 = offset;
+			int i9 = offset + length;
+			
+			List<Integer> indexs2 = getPattern(indexs, i);
+			for (int j = 0 ; j < indexs2.size() ; j++) {
+				int i1 = indexs2.get(j);
+				List<SQLToken> sqlTokens1 = pattern01(tokens, i0, i1 - i0);
+				if (null == sqlTokens1) {
+					match = false;
+					break;
+				}
+				result.addAll(sqlTokens1);
+				
+				i0 = i1+1;
+				result.add( new SQLToken(",") );
+			}
+			if (match) {
+				List<SQLToken> sqlTokens1 = pattern01(tokens, i0, i9 - i0);
+				if (null == sqlTokens1) {
+					match = false;
+				} else {
+					result.addAll(sqlTokens1);
+				}
+			}
+			
+			if (match) {
+				setSQLToken( new SQLToken(result) );
+				return true;
+			}
+		}
+
+/*
 		List<Integer> indexs = splitToken(tokens, offset, length, ",");
 		if (0 == indexs.size()) {
 			if (1 == length) {
@@ -115,32 +171,32 @@ public class SelectList extends AbstractSyntax {
 				}
 			}
 		}
-		
+*/
 		return false;
 	}
 	
 	private List<SQLToken> pattern01(final List<Token> tokens, final int offset, final int length) throws SyntaxException {
-		if (3 == length && startsWith(tokens, offset+1, length-1, ".", "*")) {
+		if (3 == length && endsWith(tokens, offset, length, ".", "*")) {
 			List<SQLToken> result = new ArrayList<SQLToken>();
-			result.add( new SQLToken( tokens.get(offset).getToken()) );
+			result.add( new SQLToken( tokens.get(offset).getToken()) ); // query_name or table or view or materialized_view
 			result.add( new SQLToken("."));
 			result.add( new SQLToken("*"));
 			return result;
-		} else if (5 == length && startsWith(tokens, offset+1, length-1, ".") && startsWith(tokens, offset+3, length-3, ".", "*")) {
+		} else if (5 == length && isEqualsToken(tokens.get(offset+1), ".") && endsWith(tokens, offset, length, ".", "*")) {
 			List<SQLToken> result = new ArrayList<SQLToken>();
-			result.add( new SQLToken( tokens.get(offset+0).getToken()) );
+			result.add( new SQLToken( tokens.get(offset+0).getToken()) ); // schema
 			result.add( new SQLToken("."));
-			result.add( new SQLToken( tokens.get(offset+2).getToken()) );
+			result.add( new SQLToken( tokens.get(offset+2).getToken()) ); // table or view or materialized_view
 			result.add( new SQLToken("."));
-			result.add( new SQLToken("*"));	
+			result.add( new SQLToken("*"));
 			return result;
 		} else {
-			int i0 = offset;
-			int i2 = offset + length;
+			int start = offset;
+			int end = offset + length;
 
 			if (1 == length) {
 				Expr expr = new Expr(getNestIndex());
-				if (expr.analyze(tokens, offset, length)) {
+				if (expr.analyze(tokens, start, length)) {
 					List<SQLToken> result = new ArrayList<SQLToken>();
 					result.add(expr.getSQLToken());
 					return result;
@@ -148,42 +204,42 @@ public class SelectList extends AbstractSyntax {
 			} else if (2 == length) {
 				Expr expr = null;
 				expr = new Expr(getNestIndex());
-				if (expr.analyze(tokens, offset, length)) {
+				if (expr.analyze(tokens, start, length)) {
 					List<SQLToken> result = new ArrayList<SQLToken>();
 					result.add(expr.getSQLToken());
 					return result;
 				} 
 				expr = new Expr(getNestIndex());
-				if (expr.analyze(tokens, offset, length-1)) {
+				if (expr.analyze(tokens, start, length-1)) {
 					List<SQLToken> result = new ArrayList<SQLToken>();
 					result.add(expr.getSQLToken());
-					result.add( new SQLToken(tokens.get(offset+1).getToken()));
+					result.add( new SQLToken(tokens.get(offset+1).getToken())); // c_alias
 					return result;
 				} 
 			} else {
 				Token token = tokens.get(offset+length-2);
 				if (isEqualsToken(token, "AS")) {
 					Expr expr = new Expr(getNestIndex());
-					if (expr.analyze(tokens, offset, length-2)) {
+					if (expr.analyze(tokens, start, length-2)) {
 						List<SQLToken> result = new ArrayList<SQLToken>();
 						result.add(expr.getSQLToken());
 						result.add( new SQLToken("AS"));
-						result.add( new SQLToken(tokens.get(offset+length-1).getToken()));
+						result.add( new SQLToken(tokens.get(offset+length-1).getToken())); // c_alias
 						return result;
 					}
 				} else {
 					Expr expr = null;
 					expr = new Expr(getNestIndex());
-					if (expr.analyze(tokens, offset, length)) {
+					if (expr.analyze(tokens, start, length)) {
 						List<SQLToken> result = new ArrayList<SQLToken>();
 						result.add(expr.getSQLToken());
 						return result;
 					} 
 					expr = new Expr(getNestIndex());
-					if (expr.analyze(tokens, offset, length-1)) {
+					if (expr.analyze(tokens, start, length-1)) {
 						List<SQLToken> result = new ArrayList<SQLToken>();
 						result.add(expr.getSQLToken());
-						result.add( new SQLToken(tokens.get(offset+1).getToken()));
+						result.add( new SQLToken(tokens.get(offset+1).getToken())); // c_alias
 						return result;
 					} 
 				}

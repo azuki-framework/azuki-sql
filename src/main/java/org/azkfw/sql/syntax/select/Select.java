@@ -17,10 +17,17 @@
  */
 package org.azkfw.sql.syntax.select;
 
+import java.io.File;
 import java.util.ArrayList;
 import java.util.List;
 
+import org.azkfw.analysis.lexical.scanner.SQLScanner;
+import org.azkfw.analysis.lexical.scanner.Scanner;
 import org.azkfw.analysis.lexical.scanner.Token;
+import org.azkfw.analysis.lexical.scanner.Tokens;
+import org.azkfw.analysis.lexical.scanner.pattern.CommentTokenPattern;
+import org.azkfw.analysis.lexical.scanner.pattern.DustTokenPattern;
+import org.azkfw.analysis.util.AnalysisUtility;
 import org.azkfw.sql.syntax.AbstractSyntax;
 import org.azkfw.sql.syntax.SyntaxException;
 import org.azkfw.sql.syntax.clause.ForUpdateClause;
@@ -51,6 +58,37 @@ import org.azkfw.sql.token.SQLToken;
  */
 public class Select extends AbstractSyntax {
 
+	public static void main(final String[] args) {
+		String source = AnalysisUtility.getString(new File(args[0]), args[1]);
+		
+		Scanner scanner = new SQLScanner();
+		Tokens ts = scanner.scan(source);
+
+		List<Token> tokens = new ArrayList<Token>();
+		for (Token token : ts.list()) {
+			if (DustTokenPattern.NAME.equals(token.getType())) {
+				continue;
+			}
+			if (CommentTokenPattern.NAME.equals(token.getType())) {
+				continue;
+			}
+			tokens.add(token);
+		}
+
+		try {
+			Select a = new Select();
+			// Update a = new Update();
+			if (a.analyze(tokens)) {
+				String str3 = a.getSQLToken().toString();
+				System.out.println(str3);
+			} else {
+				System.out.println("ERROR");
+			}
+		} catch (SyntaxException ex) {
+			ex.printStackTrace();
+		}
+	}
+
 	public Select() {
 	}
 
@@ -72,7 +110,7 @@ public class Select extends AbstractSyntax {
 
 		boolean match = false;
 
-		List<Integer> indexs = splitToken(tokens, offset, length, "FOR");
+		List<Integer> indexs = splitTokenEx(tokens, offset, length, "FOR");
 		for (int i = indexs.size() - 1; i >= 0; i--) {
 			int index = indexs.get(i);
 

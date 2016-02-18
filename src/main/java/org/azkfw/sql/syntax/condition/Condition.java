@@ -52,6 +52,14 @@ public class Condition extends AbstractSyntax{
 	protected final boolean doAnalyze(final List<Token> tokens, final int offset, final int length) throws SyntaxException {
 		trace(toString(tokens, offset, length));
 
+		if ( -1 != indexOfEx(tokens, offset, length, "AND", "OR") ) {
+			CompoundCondition condition = new CompoundCondition(getNestIndex());
+			if (condition.analyze(tokens, offset, length)) {
+				setSQLToken( condition.getSQLToken() );
+				return true;
+			}
+		}
+
 		{
 			SimpleComparisonCondition condition = new SimpleComparisonCondition(getNestIndex());
 			if (condition.analyze(tokens, offset, length)) {
@@ -112,14 +120,14 @@ public class Condition extends AbstractSyntax{
 			}
 		}
 		{
-			CompoundCondition condition = new CompoundCondition(getNestIndex());
+			BetweenCondition condition = new BetweenCondition(getNestIndex());
 			if (condition.analyze(tokens, offset, length)) {
 				setSQLToken( condition.getSQLToken() );
 				return true;
 			}
 		}
 		{
-			BetweenCondition condition = new BetweenCondition(getNestIndex());
+			CompoundCondition condition = new CompoundCondition(getNestIndex());
 			if (condition.analyze(tokens, offset, length)) {
 				setSQLToken( condition.getSQLToken() );
 				return true;

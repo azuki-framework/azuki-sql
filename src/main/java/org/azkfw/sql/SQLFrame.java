@@ -22,10 +22,6 @@ import java.awt.event.ComponentAdapter;
 import java.awt.event.ComponentEvent;
 import java.awt.event.WindowAdapter;
 import java.awt.event.WindowEvent;
-import java.io.File;
-import java.io.FileInputStream;
-import java.io.IOException;
-import java.io.InputStreamReader;
 import java.nio.file.Paths;
 import java.util.ArrayList;
 import java.util.List;
@@ -39,6 +35,7 @@ import org.azkfw.analysis.lexical.scanner.Scanner;
 import org.azkfw.analysis.lexical.scanner.Token;
 import org.azkfw.analysis.lexical.scanner.Tokens;
 import org.azkfw.analysis.lexical.scanner.pattern.DustTokenPattern;
+import org.azkfw.analysis.util.AnalysisUtility;
 import org.azkfw.component.text.TextEditor;
 import org.azkfw.component.text.TextGradationsView;
 import org.azkfw.component.text.TextLineNumberView;
@@ -121,7 +118,7 @@ public class SQLFrame extends JFrame {
 		
 	}
 	private void doLoad() {
-		String source = getString(Paths.get("src", "test", "resources", "select.sql").toFile(), "UTF-8");
+		String source = AnalysisUtility.getString(Paths.get("src", "test", "resources", "select.sql").toFile(), "UTF-8");
 		
 		Scanner scanner = new SQLScanner();
 		Tokens ts = scanner.scan(source);
@@ -176,29 +173,5 @@ public class SQLFrame extends JFrame {
 			str = string;
 		}
 		return str;
-	}
-
-	public static String getString(final File file, final String charset) {
-		StringBuffer s = new StringBuffer();
-		InputStreamReader reader = null;
-		try {
-			reader = new InputStreamReader(new FileInputStream(file), charset);
-			char[] buffer = new char[1024];
-			int size = -1;
-			while (-1 != (size = reader.read(buffer, 0, 1024))) {
-				s.append(buffer, 0, size);
-			}
-		} catch (IOException ex) {
-			ex.printStackTrace();
-		} finally {
-			if (null != reader) {
-				try {
-					reader.close();
-				} catch (IOException ex) {
-					ex.printStackTrace();
-				}
-			}
-		}
-		return s.toString();
 	}
 }

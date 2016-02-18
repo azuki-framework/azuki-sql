@@ -47,26 +47,21 @@ my_fun(TO_CHAR(sysdate,'DD-MMM-YY'))
  * @author Kawakicchi
  */
 public class CompoundExpression extends AbstractSyntax {
-	
 
-	public CompoundExpression() {
-	}
-	
 	public CompoundExpression(final int index) {
 		super(index);
 	}
-	
+
 	@Override
 	protected final boolean doAnalyze(final List<Token> tokens, final int offset, final int length) throws SyntaxException {
 		trace(toString(tokens, offset, length));
 
-		Token token = null;
-		int index = offset;
+		int start = offset;
 		int end = offset + length;
 
-		if (startsWith(tokens, offset, length, "(") && endsWith(tokens, offset, length, ")")) {
+		if (startsWith(tokens, start, end - start, "(") && endsWith(tokens, start, end - start, ")")) {
 			Expr expr = new Expr(getNestIndex());
-			if (expr.analyze(tokens, offset+1, length-2)) {
+			if (expr.analyze(tokens, start + 1, end - start - 2)) {
 				List<SQLToken> sqlTokens = new ArrayList<SQLToken>();
 				sqlTokens.add( new SQLToken("("));
 				sqlTokens.add( expr.getSQLToken() );
@@ -74,31 +69,31 @@ public class CompoundExpression extends AbstractSyntax {
 				setSQLToken( new SQLToken(sqlTokens) );
 				return true;
 			}
-		} else if (startsWith(tokens, offset, length, "+") || startsWith(tokens, offset, length, "-") || startsWith(tokens, offset, length, "PRIOR")) {
+		} else if (startsWith(tokens, start, end - start, "+", "-", "PRIOR")) {
 			Expr expr = new Expr(getNestIndex());
-			if (expr.analyze(tokens, offset+1, length-1)) {
+			if (expr.analyze(tokens, start + 1, end - start - 1)) {
 				List<SQLToken> sqlTokens = new ArrayList<SQLToken>();
-				sqlTokens.add( new SQLToken(tokens.get(offset).getToken()) );
+				sqlTokens.add( new SQLToken(tokens.get(start).getToken()) );
 				sqlTokens.add( expr.getSQLToken() );
 				setSQLToken( new SQLToken(sqlTokens) );
 				return true;
 			}
 		} else {
-			List<Integer> indexs = splitToken(tokens, offset, length, "*","/","+","-","||");
+			List<Integer> indexs = splitTokenEx(tokens, start, end - start, "*","/","+","-","||");
 			if ( 0 < indexs.size()) {
 				for (int i = 0 ; i < indexs.size() ; i++) {
-					int i0 = indexs.get(i);
+					int index = indexs.get(i);
 					Expr expr1 = new Expr(getNestIndex());
-					if (!expr1.analyze(tokens, offset, i0)) {
+					if (!expr1.analyze(tokens, start, index - start)) {
 						continue;
 					}
 					Expr expr2 = new Expr(getNestIndex());
-					if (!expr2.analyze(tokens, i0+1, end-i0)) {
+					if (!expr2.analyze(tokens, index + 1, end - index)) {
 						continue;
 					}
 					List<SQLToken> sqlTokens = new ArrayList<SQLToken>();
 					sqlTokens.add(expr1.getSQLToken());
-					sqlTokens.add( new SQLToken(tokens.get(i0).getToken()));
+					sqlTokens.add( new SQLToken(tokens.get(index).getToken()));
 					sqlTokens.add(expr2.getSQLToken());
 					setSQLToken(new SQLToken(sqlTokens));
 					return true;

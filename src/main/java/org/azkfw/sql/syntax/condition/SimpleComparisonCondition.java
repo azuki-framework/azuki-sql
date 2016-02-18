@@ -82,7 +82,7 @@ public class SimpleComparisonCondition extends AbstractSyntax{
 	 * @throws SyntaxException
 	 */
 	private List<SQLToken> pattern01(final List<Token> tokens, final int offset, final int length) throws SyntaxException {
-		List<Integer> indexs = splitToken(tokens, offset, length, "!=", "^=", "<>", ">=", "<=", "=", "<", ">");
+		List<Integer> indexs = splitTokenEx(tokens, offset, length, "!=", "^=", "<>", ">=", "<=", "=", "<", ">");
 		for (int i = 0 ; i < indexs.size() ; i++) {
 			int index = indexs.get(i);
 			Expr expr1 = new Expr(getNestIndex());
@@ -102,7 +102,7 @@ public class SimpleComparisonCondition extends AbstractSyntax{
 	}
 	
 	private List<SQLToken> pattern02(final List<Token> tokens, final int offset, final int length) throws SyntaxException {
-		List<Integer> indexs = splitToken(tokens, offset, length, "!=", "^=", "<>", "=");
+		List<Integer> indexs = splitTokenEx(tokens, offset, length, "!=", "^=", "<>", "=");
 		for (int i = 0; i < indexs.size(); i++) {
 			int index = indexs.get(i);
 
@@ -133,10 +133,10 @@ public class SimpleComparisonCondition extends AbstractSyntax{
 	private List<SQLToken> pattern0201(final List<Token> tokens, final int offset, final int length) throws SyntaxException {
 		if (3 <= length) {
 			if (startsWith(tokens, offset, length, "(") && endsWith(tokens, offset, length, ")")) {				
-				int i0 = offset + 1;
-				int i9 = offset + length - 1;
+				int start = offset + 1;
+				int end = offset + length - 1;
 
-				List<Integer> indexs = splitToken(tokens, i0, i9 - i0, ",");
+				List<Integer> indexs = splitTokenEx(tokens, start, end - start, ",");
 				if (0 < indexs.size()) {
 					// ( expr , expr , ... )
 					List<SQLToken> sqlTokens = new ArrayList<SQLToken>();
@@ -145,19 +145,19 @@ public class SimpleComparisonCondition extends AbstractSyntax{
 						sqlTokens.clear();
 						sqlTokens.add(new SQLToken("("));
 						
-						List<Integer> indexs2 = getPattern(indexs, pattern);
-						int i1 = i0;
+						List<Integer> indexs2 = getPattern(indexs, i);
+						int i1 = start;
 						for (int j = 0 ; j < indexs2.size() ; j++) {
 							int i2 = indexs2.get(j);
 							Expr expr = new Expr(getNestIndex());
-							if (!expr.analyze(tokens, i1, i2-i1)) continue;
+							if (!expr.analyze(tokens, i1, i2 - i1)) continue;
 							sqlTokens.add( expr.getSQLToken() );
 							
 							i1 = i2 + 1;
 							sqlTokens.add( new SQLToken(",") );
 						}
 						Expr expr = new Expr(getNestIndex());
-						if (!expr.analyze(tokens, i1, i9-i1)) continue;
+						if (!expr.analyze(tokens, i1, end - i1)) continue;
 						sqlTokens.add(expr.getSQLToken());
 						
 						sqlTokens.add(new SQLToken(")"));
@@ -166,7 +166,7 @@ public class SimpleComparisonCondition extends AbstractSyntax{
 				} else {
 					// ( expr )
 					Expr expr = new Expr(getNestIndex());
-					if (expr.analyze(tokens, i0, i9-i0)) {
+					if (expr.analyze(tokens, start, end - start)) {
 						List<SQLToken> sqlTokens = new ArrayList<SQLToken>();
 						sqlTokens.add(new SQLToken("("));
 						sqlTokens.add(expr.getSQLToken());

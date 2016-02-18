@@ -48,36 +48,36 @@ N'this is an NCHAR string'
  */
 public class SimpleExpression extends AbstractSyntax {
 
-	public SimpleExpression() {
-	}
-	
 	public SimpleExpression(final int index) {
 		super(index);
 	}
-	
+
 	@Override
 	protected final boolean doAnalyze(final List<Token> tokens, final int offset, final int length) throws SyntaxException {
 		trace(toString(tokens, offset, length));
 
-		Token token = null;
-		int i0 = offset;
-		int i9 = offset + length;
+		int start = offset;
+		int end = offset + length;
 		
-		if (5 == length) {
-			if (!isEqualsToken(tokens.get(i0 + 1), ".")) return false;
-			if (!isEqualsToken(tokens.get(i0 + 3), ".")) return false;
+		if (endsWith(tokens, start, end - start, "(", "+", ")") ) {
+			end -= 3;
+		}
+		
+		if (5 == end - start) {
+			if (!isEqualsToken(tokens.get(start + 1), ".")) return false;
+			if (!isEqualsToken(tokens.get(start + 3), ".")) return false;
 			
-			setSQLToken( new SQLToken( toString(tokens, i0, length) ));
+			setSQLToken( new SQLToken( toString(tokens, start, end - start) ));
 			return true;
 			
-		} else if (3 == length) {
-			if (!isEqualsToken(tokens.get(i0 + 1), ".")) return false;
+		} else if (3 == end - start) {
+			if (!isEqualsToken(tokens.get(start + 1), ".")) return false;
 			
-			setSQLToken( new SQLToken( toString(tokens, i0, length) ));
+			setSQLToken( new SQLToken( toString(tokens, start, end - start) ));
 			return true;
 			
-		} else if (1 == length) {
-			setSQLToken( new SQLToken( toString(tokens, i0, length) ));
+		} else if (1 == end - start) {
+			setSQLToken( new SQLToken( toString(tokens, start, end - start) ));
 			return true;
 			
 		}

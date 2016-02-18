@@ -1,4 +1,11 @@
 (
+SELECT
+    *
+FROM
+    tbl
+WHERE
+    a = 0
+UNION
 SELECT /*+ hint */
     query_name.*
   , schema1 . table1 . *

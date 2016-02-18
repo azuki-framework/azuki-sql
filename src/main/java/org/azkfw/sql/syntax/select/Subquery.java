@@ -69,7 +69,7 @@ public class Subquery extends AbstractSyntax {
 
 		boolean match = false;
 
-		List<Integer> indexs = splitToken(tokens, offset, length, "ORDER");
+		List<Integer> indexs = splitTokenEx(tokens, offset, length, "ORDER");
 		for (int i = indexs.size() - 1; i >= 0; i--) {
 			int index = indexs.get(i);
 
@@ -105,7 +105,7 @@ public class Subquery extends AbstractSyntax {
 	private List<SQLToken> pattern01(final List<Token> tokens, final int offset, final int length) throws SyntaxException {
 		List<SQLToken> sqlTokens = null;
 
-		sqlTokens = pattern0101(tokens, offset, length);
+		sqlTokens = pattern0103(tokens, offset, length);
 		if (null != sqlTokens) {
 			return sqlTokens;
 		}
@@ -114,8 +114,8 @@ public class Subquery extends AbstractSyntax {
 		if (null != sqlTokens) {
 			return sqlTokens;
 		}
-		
-		sqlTokens = pattern0103(tokens, offset, length);
+
+		sqlTokens = pattern0101(tokens, offset, length);
 		if (null != sqlTokens) {
 			return sqlTokens;
 		}
@@ -138,71 +138,75 @@ public class Subquery extends AbstractSyntax {
 	private List<SQLToken> pattern0102(final List<Token> tokens, final int offset, final int length) throws SyntaxException {
 		if (!(parent instanceof Subquery) || 2 != pattern ) {
 			List<SQLToken> result = new ArrayList<SQLToken>();
-	
-			List<Integer> indexs = splitToken(tokens, offset, length, "UNION", "INTERSECT", "MINUS");
-			int pattern = getPatternSize(indexs);
-			for (int i = 0; i < pattern; i++) {
-				List<Integer> indexs2 = getPattern(indexs, pattern);
-	
-				result.clear();
-				boolean match = true;
-				
-				int start = offset;
-				int end = offset + length;
-				int index1 = start;
-				
-				for (int j = 0; j < indexs2.size(); j++) {
-					int index2 = indexs2.get(j);
-	
+
+			List<Integer> indexs = splitTokenEx(tokens, offset, length, "UNION", "INTERSECT", "MINUS");
+			if (0 < indexs.size()) { // 必ず1つ以上ある
+				int pattern = getPatternSize(indexs);
+				for (int i = pattern - 1; i >= 0; i--) {
+					List<Integer> indexs2 = getPattern(indexs, i);
+					if (0 == indexs2.size()) { // 必ず1つ以上ある条件のみ
+						continue;
+					}
+		
+					result.clear();
+					boolean match = true;
+					
+					int start = offset;
+					int end = offset + length;
+					int index1 = start;
+					
+					for (int j = 0; j < indexs2.size(); j++) {
+						int index2 = indexs2.get(j);
+		
+						Subquery subquery = new Subquery(this, 2, getNestIndex());
+						if (!subquery.analyze(tokens, index1, index2 - index1)) {
+							match = false;
+							break;
+						}
+						result.add(subquery.getSQLToken());
+		
+						if (startsWith(tokens, index2, end - index2, "UNION", "ALL")) {
+							result.add(new SQLToken("UNION"));
+							result.add(new SQLToken("ALL"));
+							index1 = index2 + 2;
+						} else {
+							result.add(new SQLToken(tokens.get(index2).getToken()));
+							index1 = index2 + 1;
+						}
+					}
+					if (!match) {
+						continue;
+					}
+		
 					Subquery subquery = new Subquery(this, 2, getNestIndex());
-					if (!subquery.analyze(tokens, index1, index2 - index1)) {
-						match = false;
-						break;
+					if (!subquery.analyze(tokens, index1, end - index1)) {
+						continue;
 					}
 					result.add(subquery.getSQLToken());
-	
-					if (startsWith(tokens, index2, end - index2, "UNION", "ALL")) {
-						result.add(new SQLToken("UNION"));
-						result.add(new SQLToken("ALL"));
-						index1 = index2 + 2;
-					} else {
-						result.add(new SQLToken(tokens.get(index2).getToken()));
-						index1 = index2 + 1;
-					}
-				}
-				if (!match) {
-					continue;
-				}
-	
-				Subquery subquery = new Subquery(this, 2, getNestIndex());
-				if (!subquery.analyze(tokens, index1, end - index1)) {
-					continue;
-				}
-	
-				return result;
-			}
 
+					return result;
+				}
+			}
 		}
 		return null;
 	}
 
 	private List<SQLToken> pattern0103(final List<Token> tokens, final int offset, final int length) throws SyntaxException {
 		if (!(parent instanceof Subquery) || 3 != pattern ) {
+			if (startsWith(tokens, offset, length, "(") && endsWith(tokens, offset, length, ")")) {
 
-			if (!startsWith(tokens, offset, length, "("))
-				return null;
-			if (!endsWith(tokens, offset, length, ")"))
-				return null;
-	
-			Subquery subquery = new Subquery(this, 3, getNestIndex());
-			if (!subquery.analyze(tokens, offset + 1, length - 2))
-				return null;
-	
-			List<SQLToken> result = new ArrayList<SQLToken>();
-			result.add(new SQLToken("("));
-			result.add(subquery.getSQLToken());
-			result.add(new SQLToken(")"));
-			return result;
+				Subquery subquery = new Subquery(this, 3, getNestIndex());
+				if (!subquery.analyze(tokens, offset + 1, length - 2)) {
+					return null;
+				}
+
+				List<SQLToken> result = new ArrayList<SQLToken>();
+				result.add(new SQLToken("("));
+				result.add(subquery.getSQLToken());
+				result.add(new SQLToken(")"));
+				return result;
+
+			}
 		}
 		return null;
 	}

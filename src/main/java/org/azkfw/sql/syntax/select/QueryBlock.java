@@ -60,36 +60,36 @@ public class QueryBlock extends AbstractSyntax {
 		trace(toString(tokens, offset, length));
 		
 		List<SQLToken> sqlTokens = new ArrayList<SQLToken>();
-		
-		int i0 = offset;
-		int i3 = offset + length;		
 
-		List<Integer> indexs1 = splitToken(tokens, offset, length, "SELECT");
+		int start = offset;
+		int end = offset + length;
+
+		List<Integer> indexs1 = splitTokenEx(tokens, start, end - start, "SELECT");
 		for (int i = 0 ; i < indexs1.size() ; i++) {
-			int i1 = indexs1.get(i);
+			int index1 = indexs1.get(i);
 			
 			sqlTokens.clear();
 
-			List<SQLToken> sqlTokens1 = pattern01(tokens, i0, i1-i0);
+			List<SQLToken> sqlTokens1 = pattern01(tokens, start, index1 - start);
 			if (null == sqlTokens1) {
 				continue;
 			}
 			sqlTokens.addAll(sqlTokens1);
 			sqlTokens.add(new SQLToken("SELECT"));
-			
-			i1 ++;
-			List<Integer> indexs2 = splitToken(tokens, i1, i3-i1, "FROM");
+
+			index1 ++;
+			List<Integer> indexs2 = splitToken(tokens, index1, end - index1, "FROM");
 			for (int j = 0 ; j < indexs2.size() ; j++) {
-				int i2 = indexs2.get(j);
+				int index2 = indexs2.get(j);
 				
-				List<SQLToken> sqlTokens2 = pattern02(tokens, i1, i2-i1);
+				List<SQLToken> sqlTokens2 = pattern02(tokens, index1, index2 - index1);
 				if (null == sqlTokens2) {
 					continue;
 				}
 
-				i2 ++;
+				index2 ++;
 
-				List<SQLToken> sqlTokens3 = pattern03(tokens, i2, i3-i2);
+				List<SQLToken> sqlTokens3 = pattern03(tokens, index2, end - index2);
 				if (null == sqlTokens3) {
 					continue;
 				}
@@ -101,10 +101,10 @@ public class QueryBlock extends AbstractSyntax {
 				return true;
 			}
 		}
-		
 		return false;
 	}
 
+	// no or subquery_factoring_clause
 	private List<SQLToken> pattern01(final List<Token> tokens, final int offset, final int length) throws SyntaxException {
 		List<SQLToken> result = new ArrayList<SQLToken>();
 		if (0 != length) {
@@ -117,6 +117,7 @@ public class QueryBlock extends AbstractSyntax {
 		return result;
 	}
 
+	// SELECT ～ FROM
 	private List<SQLToken> pattern02(final List<Token> tokens, final int offset, final int length) throws SyntaxException {		
 		List<SQLToken> result = new ArrayList<SQLToken>();
 		
@@ -148,7 +149,7 @@ public class QueryBlock extends AbstractSyntax {
 		
 		return result;
 	}
-	
+
 	private List<SQLToken> pattern0201(final List<Token> tokens, final int offset, final int length) throws SyntaxException {
 		List<SQLToken> result = new ArrayList<SQLToken>();
 		SelectList selectList = new SelectList(getNestIndex());
@@ -159,26 +160,50 @@ public class QueryBlock extends AbstractSyntax {
 		return result;
 	}
 	
+	// FROM ～ end
 	private List<SQLToken> pattern03(final List<Token> tokens, final int offset, final int length) throws SyntaxException {		
-		int i0 = offset;
-		int i5 = offset + length;
+		int start = offset;
+		int end = offset + length;
 
-		for (int i4 = i0 ; i4 <= i5 ; i4++ ) {
-			List<SQLToken> sqlTokens5 = pattern0305(tokens, i4, i5-i4);
+		List<Integer> indexs = splitTokenEx(tokens, start, end - start, "MODEL");
+		for (int i1 = indexs.size() - 1 ; i1 >= 0 ; i1--) {
+			int index = indexs.get(i1);
+			List<SQLToken> sqlTokens2 = pattern0305(tokens, index, end - index);
+			if (null == sqlTokens2) {
+				continue;
+			}
+			List<SQLToken> sqlTokens1 = pattern03_01(tokens, start, index - start);
+			if (null == sqlTokens1) {
+				continue;
+			}
+			
+			List<SQLToken> sqlTokens = new ArrayList<SQLToken>();
+			sqlTokens.addAll(sqlTokens1);
+			sqlTokens.addAll(sqlTokens2);
+			return sqlTokens;
+		}
+		List<SQLToken> sqlTokens = pattern03_01(tokens, start, end - start);
+		if (null != sqlTokens) {
+			return sqlTokens;
+		}
+
+/*
+		for (int i4 = start ; i4 <= end ; i4++ ) {
+			List<SQLToken> sqlTokens5 = pattern0305(tokens, i4, end - i4);
 			if (null == sqlTokens5) continue;
 
-			for (int i3 = i0 ; i3 <= i4 ; i3++ ) {
-				List<SQLToken> sqlTokens4 = pattern0304(tokens, i3, i4-i3);
+			for (int i3 = start ; i3 <= i4 ; i3++ ) {
+				List<SQLToken> sqlTokens4 = pattern0304(tokens, i3, i4 - i3);
 				if (null == sqlTokens4) continue;
 				
-				for (int i2 = i0 ; i2 <= i3 ; i2++ ) {
-					List<SQLToken> sqlTokens3 = pattern0303(tokens, i2, i3-i2);
+				for (int i2 = start ; i2 <= i3 ; i2++ ) {
+					List<SQLToken> sqlTokens3 = pattern0303(tokens, i2, i3 - i2);
 					if (null == sqlTokens3) continue;
 					
-					for (int i1 = i0 ; i1 <= i2 ; i1++ ) {
-						List<SQLToken> sqlTokens2 = pattern0302(tokens, i1, i2-i1);
+					for (int i1 = start ; i1 <= i2 ; i1++ ) {
+						List<SQLToken> sqlTokens2 = pattern0302(tokens, i1, i2 - i1);
 						if (null == sqlTokens2) continue;
-						List<SQLToken> sqlTokens1 = pattern0301(tokens, i0, i1-i0);
+						List<SQLToken> sqlTokens1 = pattern0301(tokens, start, i1 - start);
 						if (null == sqlTokens1) continue;
 
 						List<SQLToken> result = new ArrayList<SQLToken>();
@@ -192,17 +217,108 @@ public class QueryBlock extends AbstractSyntax {
 				}
 			}
 		}
+*/
 		return null;
 	}
 	
+	// Modelより前
+	private List<SQLToken> pattern03_01(final List<Token> tokens, final int offset, final int length) throws SyntaxException {
+		int start = offset;
+		int end = offset + length;
+
+		List<Integer> indexs = splitTokenEx(tokens, start, end - start, "GROUP");
+		for (int i1 = indexs.size() - 1 ; i1 >= 0 ; i1--) {
+			int index = indexs.get(i1);
+			List<SQLToken> sqlTokens2 = pattern0304(tokens, index, end - index);
+			if (null == sqlTokens2) {
+				continue;
+			}
+			List<SQLToken> sqlTokens1 = pattern03_02(tokens, start, index - start);
+			if (null == sqlTokens1) {
+				continue;
+			}
+			
+			List<SQLToken> sqlTokens = new ArrayList<SQLToken>();
+			sqlTokens.addAll(sqlTokens1);
+			sqlTokens.addAll(sqlTokens2);
+			return sqlTokens;
+		}
+		List<SQLToken> sqlTokens = pattern03_02(tokens, start, end - start);
+		if (null != sqlTokens) {
+			return sqlTokens;
+		}
+
+		return null;
+	}
+
+	// Group by より前
+	private List<SQLToken> pattern03_02(final List<Token> tokens, final int offset, final int length) throws SyntaxException {
+		int start = offset;
+		int end = offset + length;
+
+		List<Integer> indexs = splitTokenEx(tokens, start, end - start, "CONNECT", "START");
+		for (int i1 = indexs.size() - 1 ; i1 >= 0 ; i1--) {
+			int index = indexs.get(i1);
+			List<SQLToken> sqlTokens2 = pattern0303(tokens, index, end - index);
+			if (null == sqlTokens2) {
+				continue;
+			}
+			List<SQLToken> sqlTokens1 = pattern03_03(tokens, start, index - start);
+			if (null == sqlTokens1) {
+				continue;
+			}
+			
+			List<SQLToken> sqlTokens = new ArrayList<SQLToken>();
+			sqlTokens.addAll(sqlTokens1);
+			sqlTokens.addAll(sqlTokens2);
+			return sqlTokens;
+		}
+		List<SQLToken> sqlTokens = pattern03_03(tokens, start, end - start);
+		if (null != sqlTokens) {
+			return sqlTokens;
+		}
+
+		return null;
+	}
+
+	// hierarchical より前
+	private List<SQLToken> pattern03_03(final List<Token> tokens, final int offset, final int length) throws SyntaxException {
+		int start = offset;
+		int end = offset + length;
+
+		List<Integer> indexs = splitTokenEx(tokens, start, end - start, "WHERE");
+		for (int i1 = indexs.size() - 1 ; i1 >= 0 ; i1--) {
+			int index = indexs.get(i1);
+			List<SQLToken> sqlTokens2 = pattern0302(tokens, index, end - index);
+			if (null == sqlTokens2) {
+				continue;
+			}
+			List<SQLToken> sqlTokens1 = pattern0301(tokens, start, index - start);
+			if (null == sqlTokens1) {
+				continue;
+			}
+			
+			List<SQLToken> sqlTokens = new ArrayList<SQLToken>();
+			sqlTokens.addAll(sqlTokens1);
+			sqlTokens.addAll(sqlTokens2);
+			return sqlTokens;
+		}
+		List<SQLToken> sqlTokens = pattern0301(tokens, start, end - start);
+		if (null != sqlTokens) {
+			return sqlTokens;
+		}
+
+		return null;
+	}
+
 	private List<SQLToken> pattern0301(final List<Token> tokens, final int offset, final int length) throws SyntaxException {
 		if (0 == length) return null;
 		
 		List<SQLToken> result = new ArrayList<SQLToken>();
 		
-		List<Integer> indexs = splitToken(tokens, offset, length, ",");
+		List<Integer> indexs = splitTokenEx(tokens, offset, length, ",");
 		int pattern = getPatternSize(indexs);
-		for (int i = 0 ; i < pattern ; i++) {
+		for (int i = pattern - 1 ; i >= 0 ; i--) {
 			boolean match = true;
 
 			result.clear();
@@ -210,7 +326,7 @@ public class QueryBlock extends AbstractSyntax {
 			int i0 = offset;
 			int i9 = offset + length;
 			
-			List<Integer> indexs2 = getPattern(indexs, i);			
+			List<Integer> indexs2 = getPattern(indexs, i);
 			for (int j = 0 ; j < indexs2.size() ; j++) {
 				int i1 = indexs2.get(j);
 				List<SQLToken> sqlTokens1 = pattern030101(tokens, i0, i1 - i0);

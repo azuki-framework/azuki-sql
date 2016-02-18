@@ -70,7 +70,7 @@ public class ForUpdateClause extends AbstractSyntax {
 				int end = offset + length;
 
 				boolean match = false;
-				List<Integer> indexs = splitToken(tokens, start, end - start, "NOWAIT", "WAIT", "SKIP");
+				List<Integer> indexs = splitTokenEx(tokens, start, end - start, "NOWAIT", "WAIT", "SKIP");
 				for (int i = 0; i < indexs.size(); i++) {
 					int index = indexs.get(i);
 
@@ -125,7 +125,7 @@ public class ForUpdateClause extends AbstractSyntax {
 			int end = offset + length;
 			int index1 = start;
 
-			List<Integer> indexs = splitToken(tokens, start, end - start, ",");
+			List<Integer> indexs = splitTokenEx(tokens, start, end - start, ",");
 			for (int i = 0; i < indexs.size(); i++) {
 				int index2 = indexs.get(i);
 

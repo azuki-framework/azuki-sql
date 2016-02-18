@@ -84,7 +84,7 @@ public class OrderByClause extends AbstractSyntax {
 	private List<SQLToken> pattern01(final List<Token> tokens, final int offset, final int length) throws SyntaxException {
 		List<SQLToken> result = new ArrayList<SQLToken>();
 
-		List<Integer> indexs = splitToken(tokens, offset, length, ",");
+		List<Integer> indexs = splitTokenEx(tokens, offset, length, ",");
 		int pattern = getPatternSize(indexs);
 		for (int i = pattern - 1 ; i >= 0 ; i--) {
 			List<Integer> indexs2 = getPattern(indexs, i);
