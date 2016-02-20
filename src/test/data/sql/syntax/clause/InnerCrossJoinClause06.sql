@@ -1,0 +1,2 @@
+NATURAL INNER JOIN
+    table01

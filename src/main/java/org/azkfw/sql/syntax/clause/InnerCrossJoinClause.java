@@ -121,7 +121,7 @@ public class InnerCrossJoinClause extends AbstractSQLSyntax{
 				sqlTokens.add(condition.getSQLToken());
 				return sqlTokens;
 			} else if (startsWith(tokens, index1, end - start, KW_USING, "(") && endsWith(tokens, index1, end - index1, ")")) {
-				List<SQLToken> sqlTokens1 = patternColumns(tokens, index1 + 2, (end - 1) - (index1 + 2));
+				List<SQLToken> sqlTokens1 = patternColumnList(tokens, index1 + 2, (end - 1) - (index1 + 2));
 				if (null != sqlTokens1) {
 					sqlTokens.add(new SQLToken(KW_USING) );
 					sqlTokens.add(new SQLToken("(") );

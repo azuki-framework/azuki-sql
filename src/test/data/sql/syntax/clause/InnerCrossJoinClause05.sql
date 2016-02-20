@@ -1,0 +1,2 @@
+CROSS JOIN
+    table01

@@ -17,11 +17,13 @@
  */
 package org.azkfw.sql.syntax.clause;
 
+import java.util.ArrayList;
 import java.util.List;
 
 import org.azkfw.analysis.lexical.scanner.Token;
 import org.azkfw.sql.syntax.AbstractSyntax;
 import org.azkfw.sql.syntax.SyntaxException;
+import org.azkfw.sql.token.SQLToken;
 
 /**
  * <h1></h1>
@@ -41,6 +43,11 @@ import org.azkfw.sql.syntax.SyntaxException;
  */
 public class OuterJoinType extends AbstractSyntax{
 
+	public static final String KW_FULL = "FULL";
+	public static final String KW_LEFT = "LEFT";
+	public static final String KW_RIGHT = "RIGHT";
+	public static final String KW_OUTER = "OUTER";
+
 	public OuterJoinType(final int index) {
 		super(index);
 	}
@@ -49,7 +56,24 @@ public class OuterJoinType extends AbstractSyntax{
 	protected final boolean doAnalyze(final List<Token> tokens, final int offset, final int length) throws SyntaxException {
 		trace(toString(tokens, offset, length));
 		
-		trace("未定義");
+		if (1 == length) {
+			if (isEqualsToken(tokens.get(offset), KW_FULL, KW_LEFT, KW_RIGHT)) {
+				List<SQLToken> sqlTokens = new ArrayList<SQLToken>();
+				sqlTokens.add( new SQLToken(tokens.get(offset).getToken()) );
+				setSQLToken( new SQLToken(sqlTokens) );
+				return true;
+			}
+		} else if (2 == length) {
+			if (isEqualsToken(tokens.get(offset), KW_FULL, KW_LEFT, KW_RIGHT)) {
+				if (isEqualsToken(tokens.get(offset+1), KW_OUTER)) {
+					List<SQLToken> sqlTokens = new ArrayList<SQLToken>();
+					sqlTokens.add( new SQLToken(tokens.get(offset+0).getToken()) );
+					sqlTokens.add( new SQLToken(tokens.get(offset+1).getToken()) );
+					setSQLToken( new SQLToken(sqlTokens) );
+					return true;
+				}
+			}
+		}
 
 		return false;
 	}	

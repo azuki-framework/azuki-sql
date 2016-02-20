@@ -1,0 +1,2 @@
+FULL JOIN
+    tbl01

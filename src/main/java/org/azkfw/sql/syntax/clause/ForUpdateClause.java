@@ -115,7 +115,6 @@ public class ForUpdateClause extends AbstractSyntax {
 	}
 
 	private List<SQLToken> pattern01(final List<Token> tokens, final int offset, final int length) throws SyntaxException {
-		trace(toString(tokens, offset, length));
 		List<SQLToken> result = new ArrayList<SQLToken>();
 
 		if (startsWith(tokens, offset, length, "OF")) {
@@ -150,7 +149,6 @@ public class ForUpdateClause extends AbstractSyntax {
 	}
 	
 	private List<SQLToken> pattern0101(final List<Token> tokens, final int offset, final int length) throws SyntaxException {
-		trace(toString(tokens, offset, length));
 		List<SQLToken> result = new ArrayList<SQLToken>();
 		
 		if (1 == length) {
@@ -183,7 +181,6 @@ public class ForUpdateClause extends AbstractSyntax {
 	}
 
 	private List<SQLToken> pattern02(final List<Token> tokens, final int offset, final int length) throws SyntaxException {
-		trace(toString(tokens, offset, length));
 		List<SQLToken> result = new ArrayList<SQLToken>();
 
 		if (0 == length)

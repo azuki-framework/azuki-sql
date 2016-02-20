@@ -1,0 +1,3 @@
+NATURAL
+FULL JOIN
+    tbl01

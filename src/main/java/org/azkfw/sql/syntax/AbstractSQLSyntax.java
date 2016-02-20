@@ -34,7 +34,7 @@ public abstract class AbstractSQLSyntax extends AbstractSyntax {
 		super(index);
 	}
 	
-	protected List<SQLToken> patternColumns(final List<Token> tokens, final int offset, final int length) throws SyntaxException {
+	protected List<SQLToken> patternColumnList(final List<Token> tokens, final int offset, final int length) throws SyntaxException {
 		List<SQLToken> sqlTokens = new ArrayList<SQLToken>();
 
 		int start = offset;
@@ -63,7 +63,7 @@ public abstract class AbstractSQLSyntax extends AbstractSyntax {
 		List<SQLToken> sqlTokens = new ArrayList<SQLToken>();
 
 		int start = offset;
-		int end = offset - length;
+		int end = offset + length;
 		
 		List<Integer> indexs1 = splitTokenEx(tokens, offset, length, ",");
 		int pattern = getPatternSize(indexs1);

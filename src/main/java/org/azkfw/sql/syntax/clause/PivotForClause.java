@@ -17,11 +17,13 @@
  */
 package org.azkfw.sql.syntax.clause;
 
+import java.util.ArrayList;
 import java.util.List;
 
 import org.azkfw.analysis.lexical.scanner.Token;
-import org.azkfw.sql.syntax.AbstractSyntax;
+import org.azkfw.sql.syntax.AbstractSQLSyntax;
 import org.azkfw.sql.syntax.SyntaxException;
+import org.azkfw.sql.token.SQLToken;
 
 /**
  * <h1></h1>
@@ -39,17 +41,36 @@ import org.azkfw.sql.syntax.SyntaxException;
  * @see <a href="https://docs.oracle.com/cd/E16338_01/server.112/b56299/functions004.htm#i97469">LINK</a>
  * @author Kawakicchi
  */
-public class PivotForClause extends AbstractSyntax{
+public class PivotForClause extends AbstractSQLSyntax{
+
+	public static final String KW_FOR = "FOR";
 
 	public PivotForClause(final int index) {
 		super(index);
 	}
-	
+
 	@Override
 	protected final boolean doAnalyze(final List<Token> tokens, final int offset, final int length) throws SyntaxException {
 		trace(toString(tokens, offset, length));
-		
-		trace("未定義");
+
+		if (startsWith(tokens, offset, length, KW_FOR, "(") && endsWith(tokens, offset, length, ")")) {
+			List<SQLToken> sqlTokens1 = patternColumnList(tokens, offset + 2, length - 3);
+			if (null != sqlTokens1) {
+				List<SQLToken> sqlTokens = new ArrayList<SQLToken>();
+				sqlTokens.add( new SQLToken(KW_FOR) );
+				sqlTokens.add( new SQLToken("(") );
+				sqlTokens.addAll(sqlTokens1);
+				sqlTokens.add( new SQLToken(")") );
+				setSQLToken( new SQLToken(sqlTokens) );
+				return true;
+			}
+		} else if (startsWith(tokens, offset, length, KW_FOR) && 2 == length) {
+			List<SQLToken> sqlTokens = new ArrayList<SQLToken>();
+			sqlTokens.add( new SQLToken(KW_FOR) );
+			sqlTokens.add( new SQLToken(tokens.get(offset+1).getToken()) );
+			setSQLToken( new SQLToken(sqlTokens) );
+			return true;
+		}
 
 		return false;
 	}	
