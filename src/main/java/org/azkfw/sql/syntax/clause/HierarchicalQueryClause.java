@@ -41,9 +41,6 @@ import org.azkfw.sql.syntax.SyntaxException;
  */
 public class HierarchicalQueryClause extends AbstractSyntax {
 
-	public HierarchicalQueryClause() {
-	}
-
 	public HierarchicalQueryClause(final int index) {
 		super(index);
 	}

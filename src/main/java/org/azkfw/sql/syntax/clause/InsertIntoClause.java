@@ -41,9 +41,6 @@ import org.azkfw.sql.syntax.SyntaxException;
  */
 public class InsertIntoClause extends AbstractSyntax{
 
-	public InsertIntoClause() {
-	}
-
 	public InsertIntoClause(final int index) {
 		super(index);
 	}

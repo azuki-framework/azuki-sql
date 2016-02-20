@@ -41,9 +41,8 @@ import org.azkfw.sql.syntax.SyntaxException;
  */
 public class PivotClause extends AbstractSyntax{
 
-	public PivotClause() {
-	}
-
+	public static final String KW_PIVOT = "PIVOT";
+	
 	public PivotClause(final int index) {
 		super(index);
 	}

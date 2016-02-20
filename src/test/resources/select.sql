@@ -2,9 +2,35 @@
 SELECT
     *
 FROM
-    tbl
+    tbl0
+    INNER JOIN
+        tbl1
+    ON
+        tbl0.id   = tbl1.id
+    AND tbl0.name = tbl1.name
+    JOIN
+        tbl3
+    USING
+    (
+        column1
+    )
+    JOIN
+        tbl4
+    USING
+    (
+        column1
+      , column2
+      , column3
+    )
+    CROSS JOIN
+        tbl5
+    NATURAL JOIN
+        tbl6
+    NATURAL INNER JOIN
+        tbl7
 WHERE
     a = 0
+AND b = '1'
 UNION
 SELECT /*+ hint */
     query_name.*

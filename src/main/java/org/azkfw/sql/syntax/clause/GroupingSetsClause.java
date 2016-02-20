@@ -41,9 +41,6 @@ import org.azkfw.sql.syntax.SyntaxException;
  */
 public class GroupingSetsClause extends AbstractSyntax{
 
-	public GroupingSetsClause() {
-	}
-
 	public GroupingSetsClause(final int index) {
 		super(index);
 	}

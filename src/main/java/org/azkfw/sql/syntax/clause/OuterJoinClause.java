@@ -20,8 +20,10 @@ package org.azkfw.sql.syntax.clause;
 import java.util.List;
 
 import org.azkfw.analysis.lexical.scanner.Token;
-import org.azkfw.sql.syntax.AbstractSyntax;
+import org.azkfw.sql.syntax.AbstractSQLSyntax;
 import org.azkfw.sql.syntax.SyntaxException;
+import org.azkfw.sql.syntax.condition.Condition;
+import org.azkfw.sql.syntax.select.TableReference;
 
 /**
  * <h1></h1>
@@ -36,13 +38,18 @@ import org.azkfw.sql.syntax.SyntaxException;
  * <pre>
  * </pre>
  * </p>
+ * <p>
+ * <ul>
+ * <li>{@link QueryPartitionClause}</li>
+ * <li>{@link OuterJoinType}</li>
+ * <li>{@link TableReference}</li>
+ * <li>{@link Condition}</li>
+ * </ul>
+ * </p>
  * @see <a href="https://docs.oracle.com/cd/E16338_01/server.112/b56299/statements_9014.htm#i2080498">LINK</a>
  * @author Kawakicchi
  */
-public class OuterJoinClause extends AbstractSyntax{
-
-	public OuterJoinClause() {
-	}
+public class OuterJoinClause extends AbstractSQLSyntax{
 
 	public OuterJoinClause(final int index) {
 		super(index);

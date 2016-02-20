@@ -44,9 +44,6 @@ import org.azkfw.sql.token.SQLToken;
  */
 public class WhereClause extends AbstractSyntax {
 
-	public WhereClause() {
-	}
-	
 	public WhereClause(final int index) {
 		super(index);
 	}

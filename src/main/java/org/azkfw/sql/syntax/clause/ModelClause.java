@@ -41,9 +41,6 @@ import org.azkfw.sql.syntax.SyntaxException;
  */
 public class ModelClause extends AbstractSyntax{
 
-	public ModelClause() {
-	}
-
 	public ModelClause(final int index) {
 		super(index);
 	}

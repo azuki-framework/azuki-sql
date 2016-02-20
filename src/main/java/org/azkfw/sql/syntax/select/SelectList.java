@@ -32,14 +32,19 @@ import org.azkfw.sql.token.SQLToken;
  * </p>
  * <p>
  * <b>select_list::=</b>
- * <p><img src="./doc-files/select_list.gif"/></p>
+ * <p>
+ * <img src="./doc-files/select_list.gif"/>
+ * </p>
  * </p>
  * <p>
  * 有効な例を次に示します。
+ * 
  * <pre>
  * </pre>
  * </p>
- * @see <a href="https://docs.oracle.com/cd/E16338_01/server.112/b56299/statements_10002.htm#i2065646">LINK</a>
+ * 
+ * @see <a
+ *      href="https://docs.oracle.com/cd/E16338_01/server.112/b56299/statements_10002.htm#i2065646">LINK</a>
  * @author Kawakicchi
  */
 public class SelectList extends AbstractSyntax {
@@ -47,152 +52,100 @@ public class SelectList extends AbstractSyntax {
 	public SelectList(final int index) {
 		super(index);
 	}
-	
+
 	@Override
 	protected final boolean doAnalyze(final List<Token> tokens, final int offset, final int length) throws SyntaxException {
 		trace(toString(tokens, offset, length));
 
+		int start = offset;
+		int end = offset + length;
+
 		if (1 == length) {
-			if (endsWith(tokens, offset, length, "*")) {
+			if (endsWith(tokens, start, end - start, "*")) {
 				List<SQLToken> sqlTokens = new ArrayList<SQLToken>();
-				sqlTokens.add( new SQLToken("*") );
-				setSQLToken( new SQLToken(sqlTokens) );
+				sqlTokens.add(new SQLToken("*"));
+				setSQLToken(new SQLToken(sqlTokens));
 				return true;
 			}
 		} else if (3 == length) {
-			if (endsWith(tokens, offset, length, ".", "*")) {
+			if (endsWith(tokens, start, end - start, ".", "*")) {
 				List<SQLToken> sqlTokens = new ArrayList<SQLToken>();
-				sqlTokens.add( new SQLToken(tokens.get(offset).getToken()) ); // t_alias
-				sqlTokens.add( new SQLToken(".") );
-				sqlTokens.add( new SQLToken("*") );
-				setSQLToken( new SQLToken(sqlTokens) );
+				sqlTokens.add(new SQLToken(tokens.get(start).getToken())); // t_alias
+				sqlTokens.add(new SQLToken("."));
+				sqlTokens.add(new SQLToken("*"));
+				setSQLToken(new SQLToken(sqlTokens));
 				return true;
 			}
 		}
 
 		List<SQLToken> result = new ArrayList<SQLToken>();
 
-		List<Integer> indexs = splitTokenEx(tokens, offset, length, ",");
+		List<Integer> indexs = splitTokenEx(tokens, start, end - start, ",");
 		int pattern = getPatternSize(indexs);
-//		for (int i = 0 ; i < pattern ; i++) {
-		for (int i = pattern - 1 ; i >= 0 ; i--) { // 全件から
-			boolean match = true;
+		for (int i = pattern - 1; i >= 0; i--) { // 全件から
 
+			boolean match = true;
 			result.clear();
-			
-			int i0 = offset;
-			int i9 = offset + length;
-			
+			int index1 = start;
+
 			List<Integer> indexs2 = getPattern(indexs, i);
-			for (int j = 0 ; j < indexs2.size() ; j++) {
-				int i1 = indexs2.get(j);
-				List<SQLToken> sqlTokens1 = pattern01(tokens, i0, i1 - i0);
+			for (int j = 0; j < indexs2.size(); j++) {
+				int index2 = indexs2.get(j);
+				List<SQLToken> sqlTokens1 = pattern01(tokens, index1, index2 - index1);
 				if (null == sqlTokens1) {
 					match = false;
 					break;
 				}
 				result.addAll(sqlTokens1);
-				
-				i0 = i1+1;
-				result.add( new SQLToken(",") );
+
+				index1 = index2 + 1;
+				result.add(new SQLToken(","));
 			}
-			if (match) {
-				List<SQLToken> sqlTokens1 = pattern01(tokens, i0, i9 - i0);
-				if (null == sqlTokens1) {
-					match = false;
-				} else {
-					result.addAll(sqlTokens1);
-				}
+			if (!match) {
+				continue;
 			}
 			
-			if (match) {
-				setSQLToken( new SQLToken(result) );
-				return true;
+			List<SQLToken> sqlTokens1 = pattern01(tokens, index1, end - index1);
+			if (null == sqlTokens1) {
+				continue;
 			}
+			result.addAll(sqlTokens1);
+
+			setSQLToken(new SQLToken(result));
+			return true;
 		}
-
-/*
-		List<Integer> indexs = splitToken(tokens, offset, length, ",");
-		if (0 == indexs.size()) {
-			if (1 == length) {
-				if (!startsWith(tokens, offset, length, "*")) return false;
-
-				List<SQLToken> sqlTokens = new ArrayList<SQLToken>();
-				sqlTokens.add( new SQLToken("*"));
-				setSQLToken( new SQLToken(sqlTokens));
-				return true;
-			} else if (3 == length) {
-				if (!startsWith(tokens, offset+1, length-1, ".","*")) return false;
-				
-				List<SQLToken> sqlTokens = new ArrayList<SQLToken>();
-				sqlTokens.add( new SQLToken( tokens.get(offset).getToken() ));
-				sqlTokens.add( new SQLToken("."));
-				sqlTokens.add( new SQLToken("*"));
-				setSQLToken( new SQLToken(sqlTokens));
-				return true;
-			} 
-		} else {
-			List<SQLToken> sqlTokens = new ArrayList<SQLToken>();
-			int pattern = getPatternSize(indexs);
-			for (int i = pattern - 1 ; i >= 0 ; i--) {
-				List<Integer> indexs2 = getPattern(indexs, i);
-
-				sqlTokens.clear();
-				boolean match = true;
-				
-				int start = offset;
-				int end = offset + length;
-				int index1 = start;
-				
-				for (int j = 0 ; j < indexs2.size() ; j++) {
-					int index2 = indexs2.get(j);
-					
-					List<SQLToken> sqlTokens1 = pattern01(tokens, index1, index2 - index1);
-					if (null == sqlTokens1) {
-						match = false;
-						break;
-					}
-					sqlTokens.addAll(sqlTokens1);
-					sqlTokens.add( new SQLToken(","));
-					
-					index1 = index2 + 1;
-				}
-				if (match) {
-					List<SQLToken> sqlTokens1 = pattern01(tokens, index1, end - index1);
-					if (null == sqlTokens1) {
-						continue;
-					}
-					sqlTokens.addAll(sqlTokens1);
-				}
-				
-				if (match) {
-					setSQLToken( new SQLToken(sqlTokens));
-					return true;
-				}
-			}
-		}
-*/
 		return false;
 	}
-	
+
 	private List<SQLToken> pattern01(final List<Token> tokens, final int offset, final int length) throws SyntaxException {
+		int start = offset;
+		// int end = offset + length;
+
 		if (3 == length && endsWith(tokens, offset, length, ".", "*")) {
 			List<SQLToken> result = new ArrayList<SQLToken>();
-			result.add( new SQLToken( tokens.get(offset).getToken()) ); // query_name or table or view or materialized_view
-			result.add( new SQLToken("."));
-			result.add( new SQLToken("*"));
+			result.add(new SQLToken(tokens.get(offset).getToken())); // query_name
+																		// or
+																		// table
+																		// or
+																		// view
+																		// or
+																		// materialized_view
+			result.add(new SQLToken("."));
+			result.add(new SQLToken("*"));
 			return result;
-		} else if (5 == length && isEqualsToken(tokens.get(offset+1), ".") && endsWith(tokens, offset, length, ".", "*")) {
+		} else if (5 == length && isEqualsToken(tokens.get(offset + 1), ".") && endsWith(tokens, offset, length, ".", "*")) {
 			List<SQLToken> result = new ArrayList<SQLToken>();
-			result.add( new SQLToken( tokens.get(offset+0).getToken()) ); // schema
-			result.add( new SQLToken("."));
-			result.add( new SQLToken( tokens.get(offset+2).getToken()) ); // table or view or materialized_view
-			result.add( new SQLToken("."));
-			result.add( new SQLToken("*"));
+			result.add(new SQLToken(tokens.get(offset + 0).getToken())); // schema
+			result.add(new SQLToken("."));
+			result.add(new SQLToken(tokens.get(offset + 2).getToken())); // table
+																			// or
+																			// view
+																			// or
+																			// materialized_view
+			result.add(new SQLToken("."));
+			result.add(new SQLToken("*"));
 			return result;
 		} else {
-			int start = offset;
-			int end = offset + length;
 
 			if (1 == length) {
 				Expr expr = new Expr(getNestIndex());
@@ -200,7 +153,7 @@ public class SelectList extends AbstractSyntax {
 					List<SQLToken> result = new ArrayList<SQLToken>();
 					result.add(expr.getSQLToken());
 					return result;
-				} 
+				}
 			} else if (2 == length) {
 				Expr expr = null;
 				expr = new Expr(getNestIndex());
@@ -208,23 +161,23 @@ public class SelectList extends AbstractSyntax {
 					List<SQLToken> result = new ArrayList<SQLToken>();
 					result.add(expr.getSQLToken());
 					return result;
-				} 
+				}
 				expr = new Expr(getNestIndex());
-				if (expr.analyze(tokens, start, length-1)) {
+				if (expr.analyze(tokens, start, length - 1)) {
 					List<SQLToken> result = new ArrayList<SQLToken>();
 					result.add(expr.getSQLToken());
-					result.add( new SQLToken(tokens.get(offset+1).getToken())); // c_alias
+					result.add(new SQLToken(tokens.get(offset + 1).getToken())); // c_alias
 					return result;
-				} 
+				}
 			} else {
-				Token token = tokens.get(offset+length-2);
+				Token token = tokens.get(offset + length - 2);
 				if (isEqualsToken(token, "AS")) {
 					Expr expr = new Expr(getNestIndex());
-					if (expr.analyze(tokens, start, length-2)) {
+					if (expr.analyze(tokens, start, length - 2)) {
 						List<SQLToken> result = new ArrayList<SQLToken>();
 						result.add(expr.getSQLToken());
-						result.add( new SQLToken("AS"));
-						result.add( new SQLToken(tokens.get(offset+length-1).getToken())); // c_alias
+						result.add(new SQLToken("AS"));
+						result.add(new SQLToken(tokens.get(offset + length - 1).getToken())); // c_alias
 						return result;
 					}
 				} else {
@@ -234,19 +187,18 @@ public class SelectList extends AbstractSyntax {
 						List<SQLToken> result = new ArrayList<SQLToken>();
 						result.add(expr.getSQLToken());
 						return result;
-					} 
+					}
 					expr = new Expr(getNestIndex());
-					if (expr.analyze(tokens, start, length-1)) {
+					if (expr.analyze(tokens, start, length - 1)) {
 						List<SQLToken> result = new ArrayList<SQLToken>();
 						result.add(expr.getSQLToken());
-						result.add( new SQLToken(tokens.get(offset+1).getToken())); // c_alias
+						result.add(new SQLToken(tokens.get(offset + 1).getToken())); // c_alias
 						return result;
-					} 
+					}
 				}
 			}
-			
 		}
-		
+
 		return null;
 	}
 }

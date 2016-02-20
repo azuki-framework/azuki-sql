@@ -41,9 +41,6 @@ import org.azkfw.sql.syntax.SyntaxException;
  */
 public class Condition extends AbstractSyntax{
 
-	public Condition() {
-	}
-	
 	public Condition(final int index) {
 		super(index);
 	}

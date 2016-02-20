@@ -41,9 +41,6 @@ import org.azkfw.sql.syntax.SyntaxException;
  */
 public class PivotInClause extends AbstractSyntax{
 
-	public PivotInClause() {
-	}
-
 	public PivotInClause(final int index) {
 		super(index);
 	}

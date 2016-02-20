@@ -41,9 +41,6 @@ import org.azkfw.sql.syntax.SyntaxException;
  */
 public class CycleClause extends AbstractSyntax{
 
-	public CycleClause() {
-	}
-
 	public CycleClause(final int index) {
 		super(index);
 	}

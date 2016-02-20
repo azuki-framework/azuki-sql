@@ -127,7 +127,6 @@ public class FunctionExpression extends AbstractSyntax{
 				boolean match = true;
 
 				result.clear();
-				
 				int index1 = start;
 				
 				List<Integer> indexs2 = getPattern(indexs, i);
@@ -144,22 +143,22 @@ public class FunctionExpression extends AbstractSyntax{
 					index1 = index2 + 1;
 					result.add( new SQLToken(",") );
 				}
-				if (match) {
-					Expr expr = new Expr(getNestIndex());
-					if (!expr.analyze(tokens, index1, end - index1)) {
-						match = false;
-					} else {
-						result.add(expr.getSQLToken());
-					}
+				if (!match) {
+					continue;
 				}
 				
-				if (match) {
-					if (isEqualsToken(tokens.get(offset),"DISTINCT", "ALL")) {
-						result.add(0, new SQLToken( tokens.get(offset).getToken() ));
-					}
-
-					return result;
+				Expr expr = new Expr(getNestIndex());
+				if (!expr.analyze(tokens, index1, end - index1)) {
+					continue;
 				}
+
+				result.add(expr.getSQLToken());
+				
+				if (isEqualsToken(tokens.get(offset),"DISTINCT", "ALL")) {
+					result.add(0, new SQLToken( tokens.get(offset).getToken() ));
+				}
+
+				return result;
 			}
 		}
 		return null;

@@ -41,9 +41,6 @@ import org.azkfw.sql.syntax.SyntaxException;
  */
 public class RollupCubeClause extends AbstractSyntax{
 
-	public RollupCubeClause() {
-	}
-
 	public RollupCubeClause(final int index) {
 		super(index);
 	}

@@ -41,9 +41,6 @@ import org.azkfw.sql.syntax.SyntaxException;
  */
 public class UpdateSetClause extends AbstractSyntax{
 
-	public UpdateSetClause() {
-	}
-
 	public UpdateSetClause(final int index) {
 		super(index);
 	}

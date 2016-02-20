@@ -99,6 +99,15 @@ public abstract class AbstractSyntax implements Syntax {
 		return true;
 	}
 	
+	/**
+	 * 
+	 * @param tokens
+	 * @param offset
+	 * @param length
+	 * @param keywords
+	 * @return
+ 	 * @deprecated
+	 */
 	protected static int indexOf(final List<Token> tokens, final int offset, final int length, final String...keywords) {
 		int index = -1;
 		for (int i = offset ; i < offset + length ; i++) {
@@ -162,6 +171,15 @@ public abstract class AbstractSyntax implements Syntax {
 		return true;
 	}
 
+	/**
+	 * 
+	 * @param tokens
+	 * @param offset
+	 * @param length
+	 * @param keywords
+	 * @return
+	 * @deprecated
+	 */
 	protected List<Integer> splitToken(final List<Token> tokens, final int offset, final int length, final String...keywords) {
 		// trace(toString(tokens, offset, length));
 		List<Integer> indexs = new ArrayList<Integer>();
@@ -249,6 +267,63 @@ public abstract class AbstractSyntax implements Syntax {
 		//System.out.println(toString(result));
 		return result;
 	}
+	
+	protected final void trimPatternIndex1(final List<Token> tokens, final List<Integer> indexs, final String...keywords) {
+		for (int i = 0 ; i < indexs.size() ; i++) {
+			if (i + keywords.length > indexs.size()) {
+				break;
+			}
+			boolean match = true;
+			int index = indexs.get(i);
+			for (int j = 0 ; j < keywords.length ; j++) {
+				if (index + j != indexs.get(i + j)) {
+					match = false;
+					break;
+				}
+				if (!isEqualsToken( tokens.get(index+j) , keywords[j])) {
+					match = false;
+					break;
+				}
+			}
+			if (match) {
+				for (int j = 1 ; j < keywords.length ; j++) {
+					indexs.set(i+j, null);
+				}
+				i += keywords.length - 1;
+			}
+		}
+		for (int i = indexs.size() - 1 ; i >= 0 ; i--) {
+			if (null == indexs.get(i)) {
+				indexs.remove(i);
+			}
+		}
+	}
+	protected final void trimPatternIndex2(final List<Token> tokens, final List<Integer> indexs, final String...keywords) {
+		for (int i = 0 ; i < indexs.size() ; i++) {
+			if (i + keywords.length > indexs.size()) {
+				break;
+			}
+			boolean match = true;
+			for (int j = 0 ; j < keywords.length ; j++) {
+				if (!isEqualsToken( tokens.get(indexs.get(i+j)) , keywords[j])) {
+					match = false;
+					break;
+				}
+			}
+			if (match) {
+				for (int j = 1 ; j < keywords.length ; j++) {
+					indexs.set(i+j, null);
+				}
+				i += keywords.length - 1;
+			}
+		}
+		for (int i = indexs.size() - 1 ; i >= 0 ; i--) {
+			if (null == indexs.get(i)) {
+				indexs.remove(i);
+			}
+		}
+	}
+	
 	protected final String toString(final List<Token> tokens, final int start, final int length) {
 		StringBuffer s = new StringBuffer();
 		for (int i = start ; i < start + length ; i++) {

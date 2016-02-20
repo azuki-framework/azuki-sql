@@ -41,9 +41,6 @@ import org.azkfw.sql.syntax.SyntaxException;
  */
 public class ElseClause extends AbstractSyntax{
 
-	public ElseClause() {
-	}
-
 	public ElseClause(final int index) {
 		super(index);
 	}

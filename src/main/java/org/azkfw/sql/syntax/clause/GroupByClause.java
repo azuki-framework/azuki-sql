@@ -41,9 +41,6 @@ import org.azkfw.sql.syntax.SyntaxException;
  */
 public class GroupByClause extends AbstractSyntax {
 
-	public GroupByClause() {
-	}
-
 	public GroupByClause(final int index) {
 		super(index);
 	}

@@ -41,9 +41,6 @@ import org.azkfw.sql.syntax.SyntaxException;
  */
 public class ErrorLoggingClause extends AbstractSyntax{
 
-	public ErrorLoggingClause() {
-	}
-
 	public ErrorLoggingClause(final int index) {
 		super(index);
 	}

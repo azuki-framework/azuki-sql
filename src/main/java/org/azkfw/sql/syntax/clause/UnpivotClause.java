@@ -41,8 +41,7 @@ import org.azkfw.sql.syntax.SyntaxException;
  */
 public class UnpivotClause extends AbstractSyntax{
 
-	public UnpivotClause() {
-	}
+	public static final String KW_UNPIVOT = "UNPIVOT";
 
 	public UnpivotClause(final int index) {
 		super(index);

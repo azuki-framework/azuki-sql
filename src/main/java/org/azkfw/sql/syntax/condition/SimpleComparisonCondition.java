@@ -21,7 +21,7 @@ import java.util.ArrayList;
 import java.util.List;
 
 import org.azkfw.analysis.lexical.scanner.Token;
-import org.azkfw.sql.syntax.AbstractSyntax;
+import org.azkfw.sql.syntax.AbstractSQLSyntax;
 import org.azkfw.sql.syntax.SyntaxException;
 import org.azkfw.sql.syntax.expression.Expr;
 import org.azkfw.sql.syntax.select.Subquery;
@@ -44,10 +44,7 @@ import org.azkfw.sql.token.SQLToken;
  * @see <a href="https://docs.oracle.com/cd/E16338_01/server.112/b56299/conditions002.htm#i1033286">LINK</a>
  * @author Kawakicchi
  */
-public class SimpleComparisonCondition extends AbstractSyntax{
-
-	public SimpleComparisonCondition() {
-	}
+public class SimpleComparisonCondition extends AbstractSQLSyntax{
 
 	public SimpleComparisonCondition(final int index) {
 		super(index);
@@ -136,43 +133,13 @@ public class SimpleComparisonCondition extends AbstractSyntax{
 				int start = offset + 1;
 				int end = offset + length - 1;
 
-				List<Integer> indexs = splitTokenEx(tokens, start, end - start, ",");
-				if (0 < indexs.size()) {
-					// ( expr , expr , ... )
+				List<SQLToken> sqlTokens1 = patternExprList(tokens, start, end - start);
+				if (null != sqlTokens1) {
 					List<SQLToken> sqlTokens = new ArrayList<SQLToken>();
-					int pattern = getPatternSize(indexs);
-					for (int i = pattern - 1 ; i >= 0 ; i--) {
-						sqlTokens.clear();
-						sqlTokens.add(new SQLToken("("));
-						
-						List<Integer> indexs2 = getPattern(indexs, i);
-						int i1 = start;
-						for (int j = 0 ; j < indexs2.size() ; j++) {
-							int i2 = indexs2.get(j);
-							Expr expr = new Expr(getNestIndex());
-							if (!expr.analyze(tokens, i1, i2 - i1)) continue;
-							sqlTokens.add( expr.getSQLToken() );
-							
-							i1 = i2 + 1;
-							sqlTokens.add( new SQLToken(",") );
-						}
-						Expr expr = new Expr(getNestIndex());
-						if (!expr.analyze(tokens, i1, end - i1)) continue;
-						sqlTokens.add(expr.getSQLToken());
-						
-						sqlTokens.add(new SQLToken(")"));
-						return sqlTokens;
-					}
-				} else {
-					// ( expr )
-					Expr expr = new Expr(getNestIndex());
-					if (expr.analyze(tokens, start, end - start)) {
-						List<SQLToken> sqlTokens = new ArrayList<SQLToken>();
-						sqlTokens.add(new SQLToken("("));
-						sqlTokens.add(expr.getSQLToken());
-						sqlTokens.add(new SQLToken(")"));
-						return sqlTokens;
-					}
+					sqlTokens.add(new SQLToken("("));
+					sqlTokens.addAll( sqlTokens1 );
+					sqlTokens.add(new SQLToken(")"));
+					return sqlTokens;
 				}
 			}
 		}

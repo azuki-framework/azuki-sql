@@ -43,12 +43,22 @@ import org.azkfw.sql.token.SQLToken;
  * <pre>
  * </pre>
  * </p>
- * 
+ * <p>
+ * <ul>
+ * <li>{@link QueryBlock}</li>
+ * <li>{@link OrderByClause}</li>
+ * </ul>
+ * </p>
  * @see <a
  *      href="https://docs.oracle.com/cd/E16338_01/server.112/b56299/statements_10002.htm#i2065646">LINK</a>
  * @author Kawakicchi
  */
 public class Subquery extends AbstractSyntax {
+
+	public static final String KW_UNION = "UNION";
+	public static final String KW_INTERSECT = "INTERSECT";
+	public static final String KW_MINUS = "MINUS";
+	public static final String KW_ALL = "ALL";
 
 	private Syntax parent;
 	private int pattern;
@@ -69,7 +79,7 @@ public class Subquery extends AbstractSyntax {
 
 		boolean match = false;
 
-		List<Integer> indexs = splitTokenEx(tokens, offset, length, "ORDER");
+		List<Integer> indexs = splitTokenEx(tokens, offset, length, OrderByClause.KW_ORDER);
 		for (int i = indexs.size() - 1; i >= 0; i--) {
 			int index = indexs.get(i);
 
@@ -139,7 +149,7 @@ public class Subquery extends AbstractSyntax {
 		if (!(parent instanceof Subquery) || 2 != pattern ) {
 			List<SQLToken> result = new ArrayList<SQLToken>();
 
-			List<Integer> indexs = splitTokenEx(tokens, offset, length, "UNION", "INTERSECT", "MINUS");
+			List<Integer> indexs = splitTokenEx(tokens, offset, length, KW_UNION, KW_INTERSECT, KW_MINUS);
 			if (0 < indexs.size()) { // 必ず1つ以上ある
 				int pattern = getPatternSize(indexs);
 				for (int i = pattern - 1; i >= 0; i--) {
@@ -165,9 +175,9 @@ public class Subquery extends AbstractSyntax {
 						}
 						result.add(subquery.getSQLToken());
 		
-						if (startsWith(tokens, index2, end - index2, "UNION", "ALL")) {
-							result.add(new SQLToken("UNION"));
-							result.add(new SQLToken("ALL"));
+						if (startsWith(tokens, index2, end - index2, KW_UNION, KW_ALL)) {
+							result.add(new SQLToken(KW_UNION));
+							result.add(new SQLToken(KW_ALL));
 							index1 = index2 + 2;
 						} else {
 							result.add(new SQLToken(tokens.get(index2).getToken()));

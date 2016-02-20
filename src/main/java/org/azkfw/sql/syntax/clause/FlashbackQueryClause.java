@@ -41,8 +41,10 @@ import org.azkfw.sql.syntax.SyntaxException;
  */
 public class FlashbackQueryClause extends AbstractSyntax {
 
-	public FlashbackQueryClause() {
-	}
+	public static final String KW_VERSIONS = "VERSIONS";
+	public static final String KW_BETWEEN = "BETWEEN";
+	public static final String KW_AS = "AS";
+	public static final String KW_OF = "OF";
 	
 	public FlashbackQueryClause(final int index) {
 		super(index);
@@ -52,8 +54,8 @@ public class FlashbackQueryClause extends AbstractSyntax {
 	protected final boolean doAnalyze(final List<Token> tokens, final int offset, final int length) throws SyntaxException {
 		trace(toString(tokens, offset, length));
 
-		if (!startsWith(tokens, offset, length, "VERSIONS")) return false;
-		if (!startsWith(tokens, offset, length, "AS")) return false;
+		if (!startsWith(tokens, offset, length, KW_VERSIONS)) return false;
+		if (!startsWith(tokens, offset, length, KW_AS)) return false;
 
 		// TODO: 未定義
 		trace("未実装");

@@ -41,9 +41,6 @@ import org.azkfw.sql.syntax.SyntaxException;
  */
 public class ConditionalInsertClause extends AbstractSyntax{
 
-	public ConditionalInsertClause() {
-	}
-
 	public ConditionalInsertClause(final int index) {
 		super(index);
 	}

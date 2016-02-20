@@ -41,9 +41,6 @@ import org.azkfw.sql.syntax.SyntaxException;
  */
 public class DMLTableExpressionClause extends AbstractSyntax{
 
-	public DMLTableExpressionClause() {
-	}
-
 	public DMLTableExpressionClause(final int index) {
 		super(index);
 	}

@@ -41,9 +41,6 @@ import org.azkfw.sql.syntax.SyntaxException;
  */
 public class OuterJoinType extends AbstractSyntax{
 
-	public OuterJoinType() {
-	}
-
 	public OuterJoinType(final int index) {
 		super(index);
 	}

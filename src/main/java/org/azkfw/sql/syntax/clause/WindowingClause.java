@@ -41,9 +41,6 @@ import org.azkfw.sql.syntax.SyntaxException;
  */
 public class WindowingClause extends AbstractSyntax{
 
-	public WindowingClause() {
-	}
-
 	public WindowingClause(final int index) {
 		super(index);
 	}

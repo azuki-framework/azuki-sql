@@ -41,9 +41,6 @@ import org.azkfw.sql.syntax.SyntaxException;
  */
 public class UnpivotInClause extends AbstractSyntax{
 
-	public UnpivotInClause() {
-	}
-
 	public UnpivotInClause(final int index) {
 		super(index);
 	}

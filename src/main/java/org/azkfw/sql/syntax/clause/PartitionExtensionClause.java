@@ -40,9 +40,6 @@ import org.azkfw.sql.syntax.SyntaxException;
  */
 public class PartitionExtensionClause extends AbstractSyntax{
 
-	public PartitionExtensionClause() {
-	}
-
 	public PartitionExtensionClause(final int index) {
 		super(index);
 	}

@@ -41,9 +41,6 @@ import org.azkfw.sql.syntax.SyntaxException;
  */
 public class SubqueryRestrictionClause extends AbstractSyntax{
 
-	public SubqueryRestrictionClause() {
-	}
-
 	public SubqueryRestrictionClause(final int index) {
 		super(index);
 	}

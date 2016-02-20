@@ -41,9 +41,6 @@ import org.azkfw.sql.syntax.SyntaxException;
  */
 public class ReturnRowsClause extends AbstractSyntax{
 
-	public ReturnRowsClause() {
-	}
-
 	public ReturnRowsClause(final int index) {
 		super(index);
 	}

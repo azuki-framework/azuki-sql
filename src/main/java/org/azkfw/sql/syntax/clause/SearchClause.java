@@ -41,9 +41,6 @@ import org.azkfw.sql.syntax.SyntaxException;
  */
 public class SearchClause extends AbstractSyntax{
 
-	public SearchClause() {
-	}
-
 	public SearchClause(final int index) {
 		super(index);
 	}

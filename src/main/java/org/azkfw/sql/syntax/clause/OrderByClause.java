@@ -44,6 +44,8 @@ import org.azkfw.sql.token.SQLToken;
  */
 public class OrderByClause extends AbstractSyntax {
 	
+	public static final String KW_ORDER = "ORDER";
+	
 	public OrderByClause(final int index) {
 		super(index);
 	}
@@ -56,14 +58,14 @@ public class OrderByClause extends AbstractSyntax {
 		int start = offset;
 		int end = offset + length;
 		
-		if (startsWith(tokens, offset, length, "ORDER", "SIBLINGS", "BY")) {
-			sqlTokens.add( new SQLToken("ORDER") );
+		if (startsWith(tokens, offset, length, KW_ORDER, "SIBLINGS", "BY")) {
+			sqlTokens.add( new SQLToken(KW_ORDER) );
 			sqlTokens.add( new SQLToken("SIBLINGS") );
 			sqlTokens.add( new SQLToken("BY") );
 			start = offset + 3;
 			
-		} else if (startsWith(tokens, offset, length, "ORDER", "BY")) {
-			sqlTokens.add( new SQLToken("ORDER") );
+		} else if (startsWith(tokens, offset, length, KW_ORDER, "BY")) {
+			sqlTokens.add( new SQLToken(KW_ORDER) );
 			sqlTokens.add( new SQLToken("BY") );
 			start = offset + 2;
 
@@ -84,6 +86,9 @@ public class OrderByClause extends AbstractSyntax {
 	private List<SQLToken> pattern01(final List<Token> tokens, final int offset, final int length) throws SyntaxException {
 		List<SQLToken> result = new ArrayList<SQLToken>();
 
+		int start = offset;
+		int end = offset + length;	
+
 		List<Integer> indexs = splitTokenEx(tokens, offset, length, ",");
 		int pattern = getPatternSize(indexs);
 		for (int i = pattern - 1 ; i >= 0 ; i--) {
@@ -91,9 +96,6 @@ public class OrderByClause extends AbstractSyntax {
 
 			result.clear();
 			boolean match = true;
-
-			int start = offset;
-			int end = offset + length;	
 			int index1 = start;
 
 			for (int j = 0 ; j < indexs2.size() ; j++) {
@@ -105,21 +107,21 @@ public class OrderByClause extends AbstractSyntax {
 					break;
 				}
 				result.addAll(sqlTokens1);
+
 				result.add( new SQLToken(","));
-				
 				index1 = index2 + 1;
 			}
-			if (match) {
-				List<SQLToken> sqlTokens1 = pattern0101(tokens, index1, end - index1);
-				if (null == sqlTokens1) {
-					continue;
-				}
-				result.addAll(sqlTokens1);
+			if (!match) {
+				continue;
 			}
 
-			if (match) {
-				return result;
+			List<SQLToken> sqlTokens1 = pattern0101(tokens, index1, end - index1);
+			if (null == sqlTokens1) {
+				continue;
 			}
+			result.addAll(sqlTokens1);
+
+			return result;
 		}
 		return null;
 	}

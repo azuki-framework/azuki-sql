@@ -41,9 +41,6 @@ import org.azkfw.sql.syntax.SyntaxException;
  */
 public class ValuesClause extends AbstractSyntax{
 
-	public ValuesClause() {
-	}
-
 	public ValuesClause(final int index) {
 		super(index);
 	}

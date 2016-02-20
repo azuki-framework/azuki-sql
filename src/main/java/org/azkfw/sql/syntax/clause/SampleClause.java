@@ -41,9 +41,6 @@ import org.azkfw.sql.syntax.SyntaxException;
  */
 public class SampleClause extends AbstractSyntax{
 
-	public SampleClause() {
-	}
-
 	public SampleClause(final int index) {
 		super(index);
 	}

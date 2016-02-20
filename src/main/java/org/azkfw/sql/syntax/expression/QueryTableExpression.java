@@ -45,10 +45,6 @@ import org.azkfw.sql.token.SQLToken;
  */
 public class QueryTableExpression extends AbstractSyntax {
 
-	
-	public QueryTableExpression() {
-	}
-	
 	public QueryTableExpression(final int index) {
 		super(index);
 	}

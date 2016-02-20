@@ -42,15 +42,21 @@ import org.azkfw.sql.token.SQLToken;
  * <pre>
  * </pre>
  * </p>
+ * <p>
+ * <ul>
+ * <li>{@link QueryTableExpression}</li>
+ * <li>{@link PivotClause}</li>
+ * <li>{@link UnpivotClause}</li>
+ * <li>{@link FlashbackQueryClause}</li>
+ * </ul>
+ * </p>
  * @see <a href="https://docs.oracle.com/cd/E16338_01/server.112/b56299/statements_10002.htm#i2065646">LINK</a>
  * @author Kawakicchi
  */
 public class TableReference extends AbstractSyntax {
 	
-	
-	public TableReference() {
-	}
-	
+	public static final String KW_ONLY = "ONLY";
+
 	public TableReference(final int index) {
 		super(index);
 	}
@@ -58,106 +64,125 @@ public class TableReference extends AbstractSyntax {
 	@Override
 	protected final boolean doAnalyze(final List<Token> tokens, final int offset, final int length) throws SyntaxException {
 		trace(toString(tokens, offset, length));
-		
 
-		int i0 = offset;
-		int i3 = offset + length;
-		for (int i1 = i0 ; i1 <= i3 ; i1++) {
-			List<SQLToken> sqlTokens1 = pattern01(tokens, i0, i1-i0);
-			if (null == sqlTokens1) continue;
-			
-			for (int i2 = i1 ; i2 <= i3 ; i2++) {
-				List<SQLToken> sqlTokens2 = pattern02(tokens, i1, i2-i1);
-				if (null == sqlTokens2) continue;
-				
-				List<SQLToken> sqlTokens3 = pattern03(tokens, i2, i3-i2);
-				if (null == sqlTokens3) continue;
-				
-				List<SQLToken> sqlTokens = new ArrayList<SQLToken>();
-				sqlTokens.addAll(sqlTokens1);
-				sqlTokens.addAll(sqlTokens2);
-				sqlTokens.addAll(sqlTokens3);
-				setSQLToken( new SQLToken(sqlTokens) );
-				return true;
-			}
+		List<SQLToken> sqlTokens = pattern(tokens, offset, length);
+		if (null != sqlTokens) {
+			setSQLToken( new SQLToken(sqlTokens) );
+			return true;
 		}
+		sqlTokens = pattern(tokens, offset, length - 1);
+		if (null != sqlTokens) {
+			setSQLToken( new SQLToken(sqlTokens) );
+			setSQLToken( new SQLToken(tokens.get(offset + length - 1).getToken() ) );
+			return true;
+		}
+
 		return false;
 	}
+	
+	private List<SQLToken> pattern(final List<Token> tokens, final int offset, final int length) throws SyntaxException {
+		int start = offset;
+		int end = offset + length;
 
-	private List<SQLToken> pattern01(final List<Token> tokens, final int offset, final int length) throws SyntaxException {
-		List<SQLToken> result = null;
-		result = pattern0101(tokens, offset, length);
+		List<Integer> indexs = splitTokenEx(tokens, start, end - start, FlashbackQueryClause.KW_VERSIONS, FlashbackQueryClause.KW_AS);
+		for (int i = indexs.size() - 1 ; i >= 0 ; i--) {
+			int index = indexs.get(i);
+			List<SQLToken> sqlTokens = pattern01(tokens, start, index - start);
+			if (null == sqlTokens) {
+				continue;
+			}
+			FlashbackQueryClause flashback = new FlashbackQueryClause(getNestIndex());
+			if (!flashback.analyze(tokens, index, end - index)) {
+				continue;
+			}
+
+			List<SQLToken> result = new ArrayList<SQLToken>();
+			result.addAll(sqlTokens);
+			result.add(flashback.getSQLToken());
+			return result;
+		}
+		List<SQLToken> result = pattern01(tokens, start, end - start);
 		if (null != result) {
 			return result;
 		}
-		result = pattern0102(tokens, offset, length);
-		if (null != result) {
-			return result;
-		}
+		
 		return null;
 	}
-	private List<SQLToken> pattern0101(final List<Token> tokens, final int offset, final int length) throws SyntaxException {
-		if (4 > length) return null;
-		if (!startsWith(tokens, offset, length, "ONLY", "(")) return null;
-		if (!endsWith(tokens, offset, length, ")")) return null;
+	
+	private List<SQLToken> pattern01(final List<Token> tokens, final int offset, final int length) throws SyntaxException {
+		int start = offset;
+		int end = offset + length;
 		
-		QueryTableExpression expr = new QueryTableExpression(getNestIndex());
-		if (!expr.analyze(tokens, offset+2, length-3)) return null;
-		
-		List<SQLToken> result = new ArrayList<SQLToken>();
-		result.add( new SQLToken("ONLY"));
-		result.add( new SQLToken("("));
-		result.add(expr.getSQLToken());
-		result.add( new SQLToken(")"));
-		return result;
+		if (startsWith(tokens, start, end - start, KW_ONLY, "(")) {
+			return pattern0101(tokens, start, end - start);
+		} else {
+			return pattern0102(tokens, start, end - start);			
+		}
 	}
-	private List<SQLToken> pattern0102(final List<Token> tokens, final int offset, final int length) throws SyntaxException {
-		if (0 == length) return null;
-		
-		List<SQLToken> result = new ArrayList<SQLToken>();
-		
-		int i0 = offset;
-		int i2 = offset + length;
-		for (int i1 = i2 ; i1 > i0 ; i1--) {
-			result.clear();
-			
-			QueryTableExpression expr = new QueryTableExpression(getNestIndex());
-			if (!expr.analyze(tokens, i0, i1-i0)) continue;
-			result.add(expr.getSQLToken());
-			
-			if (i1 != i2) {
-				PivotClause clause1 = new PivotClause(getNestIndex());
-				if(!clause1.analyze(tokens, i1, i2-i1)) {
-					UnpivotClause clause2 = new UnpivotClause(getNestIndex());
-					if (!clause2.analyze(tokens, i1, i2-i1)) {
-						continue;
-					} else {
-						result.add(clause2.getSQLToken());
-					}
-				} else {
-					result.add(clause1.getSQLToken());
-				}
+
+	private List<SQLToken> pattern0101(final List<Token> tokens, final int offset, final int length) throws SyntaxException {
+		int start = offset;
+		int end = offset + length;
+
+		if (startsWith(tokens, start, end - start, KW_ONLY, "(") && endsWith(tokens, start, end - start, ")")) {
+			QueryTableExpression queryTable = new QueryTableExpression(getNestIndex());
+			if (queryTable.analyze(tokens, start + 2, end - (start + 2) - 1)) {
+				List<SQLToken> result = new ArrayList<SQLToken>();
+				result.add( new SQLToken(KW_ONLY) ) ;
+				result.add( new SQLToken("(") ) ;
+				result.add( queryTable.getSQLToken() ) ;
+				result.add( new SQLToken(")") ) ;
 			}
-			return result;
 		}
 		return null;
 	}
 	
-	private List<SQLToken> pattern02(final List<Token> tokens, final int offset, final int length) throws SyntaxException {
-		List<SQLToken> result = new ArrayList<SQLToken>();
-		if (0 != length) {
-			FlashbackQueryClause clause = new FlashbackQueryClause(getNestIndex());
-			if (!clause.analyze(tokens, offset, length)) return null;
-			result.add(clause.getSQLToken());
+	private List<SQLToken> pattern0102(final List<Token> tokens, final int offset, final int length) throws SyntaxException {
+		int start = offset;
+		int end = offset + length;
+
+		List<Integer> indexs = splitTokenEx(tokens, start, end - start, PivotClause.KW_PIVOT, UnpivotClause.KW_UNPIVOT);
+		if (0 == indexs.size()) {
+			QueryTableExpression queryTable = new QueryTableExpression(getNestIndex());
+			if (queryTable.analyze(tokens, start, end-start)) {
+				List<SQLToken> sqlTokens = new ArrayList<SQLToken>();
+				sqlTokens.add(queryTable.getSQLToken());
+				return sqlTokens;
+			}
+		} else {
+			for (int i = 0 ; i < indexs.size() ; i++) {
+				int index = indexs.get(i);
+				
+				if (startsWith(tokens, index, 1, PivotClause.KW_PIVOT)) {
+					PivotClause pivot = new PivotClause(getNestIndex());
+					if (!pivot.analyze(tokens, index, end - index)) {
+						continue;
+					}
+					QueryTableExpression queryTable = new QueryTableExpression(getNestIndex());
+					if (!queryTable.analyze(tokens, start, index-start)) {
+						continue;
+					}
+					List<SQLToken> sqlTokens = new ArrayList<SQLToken>();
+					sqlTokens.add(queryTable.getSQLToken());
+					sqlTokens.add(pivot.getSQLToken());
+					return sqlTokens;
+				} else if (startsWith(tokens, index, 1, UnpivotClause.KW_UNPIVOT)) {
+					UnpivotClause unpivot = new UnpivotClause(getNestIndex());
+					if (!unpivot.analyze(tokens, index, end - index)) {
+						continue;
+					}
+					QueryTableExpression queryTable = new QueryTableExpression(getNestIndex());
+					if (!queryTable.analyze(tokens, start, index-start)) {
+						continue;
+					}
+					List<SQLToken> sqlTokens = new ArrayList<SQLToken>();
+					sqlTokens.add(queryTable.getSQLToken());
+					sqlTokens.add(unpivot.getSQLToken());
+					return sqlTokens;
+				}
+				
+			}
 		}
-		return result;
-	}
-	private List<SQLToken> pattern03(final List<Token> tokens, final int offset, final int length) throws SyntaxException {
-		List<SQLToken> result = new ArrayList<SQLToken>();
-		if (0 != length) {
-			if (1 != length) return null;
-			result.add( new SQLToken( tokens.get(offset).getToken() ) );
-		}
-		return result;
+		return null;
 	}
 }

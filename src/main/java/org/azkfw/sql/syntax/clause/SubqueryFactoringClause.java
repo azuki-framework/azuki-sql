@@ -41,9 +41,6 @@ import org.azkfw.sql.syntax.SyntaxException;
  */
 public class SubqueryFactoringClause extends AbstractSyntax{
 
-	public SubqueryFactoringClause() {
-	}
-
 	public SubqueryFactoringClause(final int index) {
 		super(index);
 	}
